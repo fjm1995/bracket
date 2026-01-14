@@ -1,6 +1,13 @@
-import { Tournament } from '../types/bracket';
+import { v4 as uuidv4 } from 'uuid';
+import { Tournament, ScoringMode } from '../types/bracket';
+import {
+  assignParticipantsToMatches,
+  determineWinner,
+  progressWinnerToNextRound
+} from './tournamentService';
 
 const STORAGE_KEY = 'tournaments';
+const ACTIVE_TOURNAMENT_KEY = 'activeTournamentId';
 
 function readTournaments(): Tournament[] {
   try {
@@ -21,76 +28,54 @@ function writeTournaments(tournaments: Tournament[]): void {
   }
 }
 
-function generateMatchStructure(participantCount: number) {
-  const rounds = Math.ceil(Math.log2(participantCount));
-  const matches = [];
-
-  for (let round = 1; round <= rounds; round++) {
-    const matchesInRound = Math.pow(2, rounds - round);
-    for (let position = 1; position <= matchesInRound; position++) {
-      matches.push({
-        id: `match_${round}_${position}`,
-        round,
-        position,
-        participant1: null,
-        participant2: null,
-        participant1Score: 0,
-        participant2Score: 0,
-        winner: null
-      });
-    }
+export function getActiveTournamentId(): string | null {
+  try {
+    return localStorage.getItem(ACTIVE_TOURNAMENT_KEY);
+  } catch {
+    return null;
   }
-
-  return matches;
 }
 
-function shuffleArray<T>(array: T[]): T[] {
-  const newArray = [...array];
-  for (let i = newArray.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
-  }
-  return newArray;
-}
-
-function updateMatchesAfterParticipantChange(tournament: Tournament) {
-  const participantCount = tournament.participants.length;
-  const totalRounds = Math.ceil(Math.log2(participantCount));
-  tournament.totalRounds = totalRounds;
-
-  // Generate new match structure
-  tournament.matches = generateMatchStructure(participantCount);
-
-  // Assign participants to first round matches
-  const shuffledParticipants = shuffleArray([...tournament.participants]);
-  for (let i = 0; i < shuffledParticipants.length; i += 2) {
-    const matchIndex = Math.floor(i / 2);
-    if (matchIndex < tournament.matches.length) {
-      const match = tournament.matches[matchIndex];
-      match.participant1 = shuffledParticipants[i];
-      if (i + 1 < shuffledParticipants.length) {
-        match.participant2 = shuffledParticipants[i + 1];
-      }
+export function setActiveTournamentId(id: string | null): void {
+  try {
+    if (id) {
+      localStorage.setItem(ACTIVE_TOURNAMENT_KEY, id);
+    } else {
+      localStorage.removeItem(ACTIVE_TOURNAMENT_KEY);
     }
+  } catch (error) {
+    console.error('Error saving active tournament:', error);
   }
-
-  tournament.currentRound = 1;
 }
 
 export const db = {
   getTournaments: async (): Promise<Tournament[]> => {
-    return readTournaments();
+    // Simulate async for consistency
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(readTournaments());
+      }, 100);
+    });
   },
 
-  createTournament: async (tournament: Omit<Tournament, 'id' | 'participants' | 'matches' | 'currentRound' | 'totalRounds'>): Promise<Tournament> => {
+  createTournament: async (tournament: {
+    name: string;
+    game: string;
+    scoringMode: ScoringMode;
+    scoreLabel: string;
+    targetScore?: number;
+  }): Promise<Tournament> => {
     const tournaments = readTournaments();
+    const now = Date.now();
     const newTournament: Tournament = {
-      id: `tournament_${Date.now()}`,
+      id: uuidv4(),
       ...tournament,
       participants: [],
       matches: [],
       currentRound: 1,
-      totalRounds: 0
+      totalRounds: 0,
+      createdAt: now,
+      updatedAt: now
     };
     tournaments.push(newTournament);
     writeTournaments(tournaments);
@@ -101,6 +86,11 @@ export const db = {
     const tournaments = readTournaments();
     const filteredTournaments = tournaments.filter(t => t.id !== id);
     writeTournaments(filteredTournaments);
+    
+    // Clear active tournament if it was deleted
+    if (getActiveTournamentId() === id) {
+      setActiveTournamentId(null);
+    }
   },
 
   addParticipant: async (tournamentId: string, name: string): Promise<Tournament> => {
@@ -109,15 +99,20 @@ export const db = {
     if (!tournament) throw new Error('Tournament not found');
 
     const newParticipant = {
-      id: `participant_${Date.now()}`,
-      name,
+      id: uuidv4(),
+      name: name.trim(),
       gamePoints: 0
     };
 
     tournament.participants.push(newParticipant);
-    updateMatchesAfterParticipantChange(tournament);
+    const updatedTournament = assignParticipantsToMatches(tournament);
+    
+    // Update in array
+    const index = tournaments.findIndex(t => t.id === tournamentId);
+    tournaments[index] = { ...updatedTournament, updatedAt: Date.now() };
+    
     writeTournaments(tournaments);
-    return tournament;
+    return tournaments[index];
   },
 
   updateParticipant: async (tournamentId: string, participantId: string, name: string): Promise<Tournament> => {
@@ -128,7 +123,22 @@ export const db = {
     const participant = tournament.participants.find(p => p.id === participantId);
     if (!participant) throw new Error('Participant not found');
 
-    participant.name = name;
+    participant.name = name.trim();
+    
+    // Update participant name in all matches
+    tournament.matches.forEach(match => {
+      if (match.participant1?.id === participantId) {
+        match.participant1.name = name.trim();
+      }
+      if (match.participant2?.id === participantId) {
+        match.participant2.name = name.trim();
+      }
+      if (match.winner?.id === participantId) {
+        match.winner.name = name.trim();
+      }
+    });
+    
+    tournament.updatedAt = Date.now();
     writeTournaments(tournaments);
     return tournament;
   },
@@ -139,12 +149,21 @@ export const db = {
     if (!tournament) throw new Error('Tournament not found');
 
     tournament.participants = tournament.participants.filter(p => p.id !== participantId);
-    updateMatchesAfterParticipantChange(tournament);
+    const updatedTournament = assignParticipantsToMatches(tournament);
+    
+    const index = tournaments.findIndex(t => t.id === tournamentId);
+    tournaments[index] = { ...updatedTournament, updatedAt: Date.now() };
+    
     writeTournaments(tournaments);
-    return tournament;
+    return tournaments[index];
   },
 
-  updateMatch: async (tournamentId: string, matchId: string, participant1Score: number, participant2Score: number): Promise<Tournament> => {
+  updateMatch: async (
+    tournamentId: string,
+    matchId: string,
+    participant1Score: number,
+    participant2Score: number
+  ): Promise<Tournament> => {
     const tournaments = readTournaments();
     const tournament = tournaments.find(t => t.id === tournamentId);
     if (!tournament) throw new Error('Tournament not found');
@@ -152,141 +171,72 @@ export const db = {
     const match = tournament.matches.find(m => m.id === matchId);
     if (!match) throw new Error('Match not found');
 
-    // Update scores based on game type
+    // Update scores
     match.participant1Score = participant1Score;
     match.participant2Score = participant2Score;
 
-    // Update participant points based on game type
-    if (tournament.usePointSystem) {
-      switch (tournament.scoreType) {
-        case 'kills':
-          // For Fortnite, points are the number of kills
-          if (match.participant1) match.participant1.gamePoints = participant1Score;
-          if (match.participant2) match.participant2.gamePoints = participant2Score;
-          break;
-        case 'points':
-        case 'gamePoints':
-          // For 2K and Mario Kart, points are the actual score
-          if (match.participant1) match.participant1.gamePoints = participant1Score;
-          if (match.participant2) match.participant2.gamePoints = participant2Score;
-          break;
+    // Update participant gamePoints
+    if (match.participant1) {
+      const participant = tournament.participants.find(p => p.id === match.participant1!.id);
+      if (participant) {
+        participant.gamePoints = participant1Score;
+        match.participant1.gamePoints = participant1Score;
+      }
+    }
+    if (match.participant2) {
+      const participant = tournament.participants.find(p => p.id === match.participant2!.id);
+      if (participant) {
+        participant.gamePoints = participant2Score;
+        match.participant2.gamePoints = participant2Score;
       }
     }
 
-    // Determine winner based on game type
-    if (tournament.usePointSystem) {
-      switch (tournament.scoreType) {
-        case 'kills':
-          // For Fortnite, winner is first to reach target kills
-          if (tournament.targetScore) {
-            if (participant1Score >= tournament.targetScore) {
-              match.winner = match.participant1;
-            } else if (participant2Score >= tournament.targetScore) {
-              match.winner = match.participant2;
-            }
-          }
-          break;
-        case 'points':
-        case 'gamePoints':
-          // For 2K and Mario Kart, winner is highest score
-          if (participant1Score === participant2Score) {
-            match.winner = null; // Clear winner in case of tie
-          } else if (participant1Score > participant2Score) {
-            match.winner = match.participant1;
-          } else {
-            match.winner = match.participant2;
-          }
-          break;
-      }
-    } else {
-      // Standard winner determination
-      if (participant1Score === participant2Score) {
-        match.winner = null; // Clear winner in case of tie
-      } else if (participant1Score > participant2Score) {
-        match.winner = match.participant1;
-      } else {
-        match.winner = match.participant2;
-      }
-    }
+    // Determine winner
+    match.winner = determineWinner(tournament, match, participant1Score, participant2Score);
 
-    // Handle winner progression and fill-in system
-    if (match.winner) {
-      const currentRoundMatches = tournament.matches.filter(m => m.round === match.round);
-      const nextRoundMatches = tournament.matches.filter(m => m.round === match.round + 1);
-      
-      // Check if current round is complete
-      const allMatchesComplete = currentRoundMatches.every(m => m.winner);
-      
-      if (allMatchesComplete) {
-        // Find highest scoring loser for fill-in
-        const losers = currentRoundMatches
-          .map(m => {
-            const loser = m.winner?.id === m.participant1?.id ? m.participant2 : m.participant1;
-            const loserScore = m.winner?.id === m.participant1?.id ? m.participant2Score : m.participant1Score;
-            return { participant: loser, score: loserScore };
-          })
-          .filter(l => l.participant)
-          .sort((a, b) => b.score - a.score);
+    // Progress winner to next round
+    progressWinnerToNextRound(tournament, match);
 
-        const highestScoringLoser = losers[0]?.participant;
-
-        // Progress winners and handle fill-ins
-        currentRoundMatches.forEach(m => {
-          if (m.winner) {
-            const nextMatchPosition = Math.ceil(m.position / 2);
-            const nextMatch = nextRoundMatches.find(nm => nm.position === nextMatchPosition);
-            
-            if (nextMatch) {
-              if (m.position % 2 === 1) {
-                nextMatch.participant1 = m.winner;
-              } else {
-                nextMatch.participant2 = m.winner;
-              }
-            }
-          }
-        });
-
-        // Fill in any empty slots with highest scoring loser
-        if (highestScoringLoser && nextRoundMatches.length > 0) {
-          const emptySlots = nextRoundMatches.filter(m => !m.participant1 || !m.participant2);
-          if (emptySlots.length > 0) {
-            const matchToFill = emptySlots[0];
-            if (!matchToFill.participant1) {
-              matchToFill.participant1 = highestScoringLoser;
-            } else if (!matchToFill.participant2) {
-              matchToFill.participant2 = highestScoringLoser;
-            }
-          }
-        }
-
-        if (tournament.currentRound === tournament.totalRounds) {
-          // If this is the final round and all matches are complete, don't increment the round
-          // This ensures the winner banner stays visible
-          const finalMatch = tournament.matches.find(m => m.round === tournament.totalRounds);
-          if (finalMatch?.winner) {
-            // Tournament is complete with a winner
-            tournament.currentRound = tournament.totalRounds;
-          }
-        } else {
-          tournament.currentRound++;
-        }
-      } else {
-        // Just progress the winner if round isn't complete
-        const matchPosition = match.position;
-        const nextMatchIndex = Math.floor((matchPosition - 1) / 2);
-        const nextMatch = nextRoundMatches[nextMatchIndex];
-        
-        if (nextMatch) {
-          if (matchPosition % 2 === 1) {
-            nextMatch.participant1 = match.winner;
-          } else {
-            nextMatch.participant2 = match.winner;
-          }
-        }
-      }
-    }
-
+    tournament.updatedAt = Date.now();
     writeTournaments(tournaments);
     return tournament;
+  },
+
+  resetTournament: async (tournamentId: string): Promise<Tournament> => {
+    const tournaments = readTournaments();
+    const tournament = tournaments.find(t => t.id === tournamentId);
+    if (!tournament) throw new Error('Tournament not found');
+
+    // Reset all participant points
+    tournament.participants.forEach(p => {
+      p.gamePoints = 0;
+    });
+
+    // Regenerate matches
+    const updatedTournament = assignParticipantsToMatches(tournament);
+    
+    const index = tournaments.findIndex(t => t.id === tournamentId);
+    tournaments[index] = { ...updatedTournament, updatedAt: Date.now() };
+    
+    writeTournaments(tournaments);
+    return tournaments[index];
+  },
+
+  importTournaments: async (newTournaments: Tournament[]): Promise<Tournament[]> => {
+    const existingTournaments = readTournaments();
+    
+    // Merge - new tournaments with same ID replace old ones
+    const mergedMap = new Map<string, Tournament>();
+    existingTournaments.forEach(t => mergedMap.set(t.id, t));
+    newTournaments.forEach(t => mergedMap.set(t.id, { ...t, updatedAt: Date.now() }));
+    
+    const merged = Array.from(mergedMap.values());
+    writeTournaments(merged);
+    return merged;
+  },
+
+  exportTournaments: async (): Promise<string> => {
+    const tournaments = readTournaments();
+    return JSON.stringify(tournaments, null, 2);
   }
 };
