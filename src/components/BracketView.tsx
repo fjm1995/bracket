@@ -32,7 +32,12 @@ const RoundColumn = memo(function RoundColumn({
         return { participant: loser, score: loserScore };
       })
       .filter(l => l.participant)
-      .sort((a, b) => b.score - a.score);
+      .sort((a, b) => {
+        if (tournament.scoringMode === 'lower_score') {
+          return a.score - b.score;
+        }
+        return b.score - a.score;
+      });
 
     return losers[0] || null;
   }, [previousRoundMatches, round]);
@@ -194,7 +199,7 @@ export const BracketView = memo(function BracketView() {
         {hasWinner && <TournamentWinner tournament={activeTournament} />}
 
         {/* Bracket */}
-        {activeTournament.matches.length > 0 ? (
+        {activeTournament.isStarted && activeTournament.matches.length > 0 ? (
           <div className="bracket-scroll">
             <div className="flex space-x-8 pb-4" style={{ minWidth: `${Object.keys(roundMatches).length * 320}px` }}>
               {Object.entries(roundMatches).map(([round, matches]) => (
@@ -215,8 +220,17 @@ export const BracketView = memo(function BracketView() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
             </div>
-            <h3 className="text-lg font-medium text-gray-700 mb-1">Add Participants</h3>
-            <p className="text-gray-500">Add at least 2 participants to generate the bracket</p>
+            {activeTournament.isStarted ? (
+              <>
+                <h3 className="text-lg font-medium text-gray-700 mb-1">No Matches Yet</h3>
+                <p className="text-gray-500">Add at least 2 participants to generate the bracket</p>
+              </>
+            ) : (
+              <>
+                <h3 className="text-lg font-medium text-gray-700 mb-1">Tournament Not Started</h3>
+                <p className="text-gray-500">Start the tournament to generate matchups</p>
+              </>
+            )}
           </div>
         )}
       </div>

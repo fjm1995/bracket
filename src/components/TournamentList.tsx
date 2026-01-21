@@ -1,4 +1,4 @@
-import React, { useState, useCallback, memo, useMemo } from 'react';
+import React, { useState, useCallback, memo, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTournament } from '../context/TournamentContext';
 import { ConfirmModal, InputModal } from './Modal';
@@ -24,6 +24,7 @@ interface TournamentCardProps {
   onMinimize: () => void;
   onDelete: () => void;
   onAddParticipant: () => void;
+  onStart: () => void;
   onReset: () => void;
 }
 
@@ -34,6 +35,7 @@ const TournamentCard = memo(function TournamentCard({
   onMinimize,
   onDelete,
   onAddParticipant,
+  onStart,
   onReset
 }: TournamentCardProps) {
   const hasWinner = tournament.matches.some(m => m.round === tournament.totalRounds && m.winner);
@@ -81,13 +83,17 @@ const TournamentCard = memo(function TournamentCard({
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
-            <span>{tournament.participants.length} players</span>
+            <span>{tournament.participants.length} {tournament.isStarted ? 'players' : 'registered'}</span>
           </div>
           <div className="flex items-center space-x-1">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
-            <span>Round {tournament.currentRound}/{tournament.totalRounds || '—'}</span>
+            {tournament.isStarted ? (
+              <span>Round {tournament.currentRound}/{tournament.totalRounds || '—'}</span>
+            ) : (
+              <span>Not started</span>
+            )}
           </div>
         </div>
 
@@ -99,13 +105,36 @@ const TournamentCard = memo(function TournamentCard({
 
         <div className="flex flex-col space-y-2">
           <button
+            onClick={onStart}
+            disabled={tournament.isStarted || tournament.participants.length < 2}
+            className={`text-sm w-full flex items-center justify-center space-x-1 px-3 py-2 rounded-lg ${
+              tournament.isStarted
+                ? 'text-gray-500 bg-gray-100 cursor-not-allowed'
+                : tournament.participants.length < 2
+                ? 'text-gray-400 bg-gray-100 cursor-not-allowed'
+                : 'btn-primary'
+            }`}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v18l15-9L5 3z" />
+            </svg>
+            <span>
+              {tournament.isStarted ? 'Tournament Started' : 'Start Tournament'}
+            </span>
+          </button>
+          <button
             onClick={onAddParticipant}
-            className="btn-outline-primary text-sm w-full flex items-center justify-center space-x-1"
+            disabled={tournament.isStarted}
+            className={`text-sm w-full flex items-center justify-center space-x-1 px-3 py-2 rounded-lg ${
+              tournament.isStarted
+                ? 'text-gray-500 bg-gray-100 cursor-not-allowed'
+                : 'btn-outline-primary'
+            }`}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
             </svg>
-            <span>Add Player</span>
+            <span>Register Player</span>
           </button>
           
           {isActive ? (
@@ -177,6 +206,10 @@ export function TournamentList() {
     tournamentId: null
   });
   const [participantError, setParticipantError] = useState<string | undefined>(undefined);
+  const [studentName, setStudentName] = useState('');
+  const [studentTournamentId, setStudentTournamentId] = useState<string>('');
+  const [studentError, setStudentError] = useState<string | null>(null);
+  const [studentSuccess, setStudentSuccess] = useState<string | null>(null);
 
   const selectedGameConfig = GAME_RULES[newTournament.game];
 
@@ -227,6 +260,10 @@ export function TournamentList() {
 
     const tournament = state.tournaments.find(t => t.id === addParticipantModal.tournamentId);
     if (!tournament) return;
+    if (tournament.isStarted) {
+      setParticipantError('Registration is closed for this tournament.');
+      return;
+    }
 
     const validation = validateParticipantName(name, tournament.participants);
     if (!validation.valid) {
@@ -235,18 +272,71 @@ export function TournamentList() {
     }
 
     await dispatch({
-      type: 'ADD_PARTICIPANT',
+        type: 'ADD_PARTICIPANT',
       payload: { tournamentId: addParticipantModal.tournamentId, name }
     });
     setAddParticipantModal({ isOpen: false, tournamentId: null });
     setParticipantError(undefined);
   }, [addParticipantModal.tournamentId, state.tournaments, dispatch]);
 
+  const handleStartTournament = useCallback(async (tournamentId: string) => {
+    const tournament = state.tournaments.find(t => t.id === tournamentId);
+    if (!tournament || tournament.isStarted || tournament.participants.length < 2) return;
+
+    await dispatch({ type: 'START_TOURNAMENT', payload: tournamentId });
+    await dispatch({ type: 'SET_ACTIVE_TOURNAMENT', payload: tournamentId });
+  }, [state.tournaments, dispatch]);
+
+  const handleStudentSignup = useCallback(async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStudentError(null);
+    setStudentSuccess(null);
+
+    const tournament = state.tournaments.find(t => t.id === studentTournamentId);
+    if (!tournament) {
+      setStudentError('Please select a tournament.');
+      return;
+    }
+    if (tournament.isStarted) {
+      setStudentError('That tournament has already started.');
+      return;
+    }
+
+    const validation = validateParticipantName(studentName, tournament.participants);
+    if (!validation.valid) {
+      setStudentError(validation.error || 'Invalid name');
+      return;
+    }
+
+    await dispatch({
+      type: 'ADD_PARTICIPANT',
+      payload: { tournamentId: tournament.id, name: studentName.trim() }
+    });
+    setStudentName('');
+    setStudentSuccess(`Added to ${tournament.name}`);
+  }, [studentName, studentTournamentId, state.tournaments, dispatch]);
+
+  const availableTournaments = useMemo(
+    () => state.tournaments,
+    [state.tournaments]
+  );
+  const selectedTournament = useMemo(
+    () => state.tournaments.find(tournament => tournament.id === studentTournamentId) || null,
+    [state.tournaments, studentTournamentId]
+  );
+
+  useEffect(() => {
+    if (!studentTournamentId && availableTournaments.length > 0) {
+      const openTournament = availableTournaments.find(tournament => !tournament.isStarted);
+      setStudentTournamentId(openTournament ? openTournament.id : '');
+    }
+  }, [studentTournamentId, availableTournaments]);
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
+    <div>
           <h2 className="text-2xl font-bold text-white">Tournaments</h2>
           <p className="text-blue-400 text-sm">
             {state.tournaments.length} tournament{state.tournaments.length !== 1 ? 's' : ''}
@@ -272,39 +362,39 @@ export function TournamentList() {
         </div>
         <div className="card-body space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Tournament Name
-              </label>
-              <input
-                type="text"
-                value={newTournament.name}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Tournament Name
+            </label>
+            <input
+              type="text"
+              value={newTournament.name}
                 onChange={(e) => {
                   setNewTournament({ ...newTournament, name: e.target.value });
                   setNameError(null);
                 }}
-                placeholder="Enter tournament name"
+              placeholder="Enter tournament name"
                 className={`bracket-input ${nameError ? 'border-red-500 focus:ring-red-500' : ''}`}
-              />
+            />
               {nameError && <p className="mt-1 text-sm text-red-600">{nameError}</p>}
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Game Type
-              </label>
-              <select
-                value={newTournament.game}
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Game Type
+            </label>
+            <select
+              value={newTournament.game}
                 onChange={(e) => setNewTournament({ ...newTournament, game: e.target.value as GameType })}
-                className="bracket-input"
-              >
+              className="bracket-input"
+            >
                 {Object.entries(GAME_CATEGORIES).map(([category, games]) => (
                   <optgroup key={category} label={category}>
                     {games.map((game) => (
-                      <option key={game} value={game}>{game}</option>
+                <option key={game} value={game}>{game}</option>
                     ))}
                   </optgroup>
-                ))}
-              </select>
+              ))}
+            </select>
             </div>
           </div>
 
@@ -355,6 +445,72 @@ export function TournamentList() {
         </div>
       </form>
 
+      {/* Student Sign-Up */}
+      <div className="card">
+        <div className="card-header">
+          <h3 className="text-lg font-semibold text-gray-900">Student Sign-Up</h3>
+          <p className="text-sm text-gray-500">Select a tournament and enter a name to join</p>
+              </div>
+        <div className="card-body space-y-4">
+          {availableTournaments.length === 0 ? (
+            <p className="text-sm text-gray-500">Create a tournament first to start accepting sign-ups.</p>
+          ) : (
+            <form onSubmit={handleStudentSignup} className="space-y-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Student Name
+                  </label>
+                  <input
+                    type="text"
+                    value={studentName}
+                    onChange={(e) => {
+                      setStudentName(e.target.value);
+                      setStudentError(null);
+                      setStudentSuccess(null);
+                    }}
+                    className="bracket-input"
+                    placeholder="Enter student name"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Tournament
+                  </label>
+                  <select
+                    value={studentTournamentId}
+                    onChange={(e) => {
+                      setStudentTournamentId(e.target.value);
+                      setStudentError(null);
+                      setStudentSuccess(null);
+                    }}
+                    className="bracket-input"
+                  >
+                    <option value="">Select a tournament</option>
+                    {availableTournaments.map((tournament) => (
+                      <option key={tournament.id} value={tournament.id} disabled={tournament.isStarted}>
+                        {tournament.name}{tournament.isStarted ? ' (Started)' : ''}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {studentError && <p className="text-sm text-red-600">{studentError}</p>}
+              {studentSuccess && <p className="text-sm text-green-600">{studentSuccess}</p>}
+
+              <button
+                type="submit"
+                disabled={!studentName.trim() || !studentTournamentId || !!selectedTournament?.isStarted}
+                className="btn-primary w-full sm:w-auto"
+              >
+                Add Student
+              </button>
+            </form>
+          )}
+        </div>
+      </div>
+
       {/* Tournament List */}
       {state.tournaments.length > 0 ? (
         <div>
@@ -370,6 +526,7 @@ export function TournamentList() {
                   onMinimize={() => dispatch({ type: 'SET_ACTIVE_TOURNAMENT', payload: null })}
                   onDelete={() => setDeleteModal({ isOpen: true, tournamentId: tournament.id })}
                   onAddParticipant={() => setAddParticipantModal({ isOpen: true, tournamentId: tournament.id })}
+                  onStart={() => handleStartTournament(tournament.id)}
                   onReset={() => setResetModal({ isOpen: true, tournamentId: tournament.id })}
                 />
               ))}
@@ -387,7 +544,7 @@ export function TournamentList() {
             <h3 className="text-lg font-medium text-gray-900 mb-1">No tournaments yet</h3>
             <p className="text-gray-500">Create your first tournament above to get started!</p>
           </div>
-        </div>
+      </div>
       )}
 
       {/* Delete Confirmation Modal */}

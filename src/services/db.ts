@@ -12,7 +12,11 @@ const ACTIVE_TOURNAMENT_KEY = 'activeTournamentId';
 function readTournaments(): Tournament[] {
   try {
     const data = localStorage.getItem(STORAGE_KEY);
-    return data ? JSON.parse(data) : [];
+    const tournaments: Tournament[] = data ? JSON.parse(data) : [];
+    return tournaments.map(tournament => ({
+      ...tournament,
+      isStarted: tournament.isStarted ?? (tournament.matches?.length ?? 0) > 0
+    }));
   } catch (error) {
     console.error('Error reading from localStorage:', error);
     return [];
@@ -70,6 +74,7 @@ export const db = {
     const newTournament: Tournament = {
       id: uuidv4(),
       ...tournament,
+      isStarted: false,
       participants: [],
       matches: [],
       currentRound: 1,
@@ -97,6 +102,7 @@ export const db = {
     const tournaments = readTournaments();
     const tournament = tournaments.find(t => t.id === tournamentId);
     if (!tournament) throw new Error('Tournament not found');
+    if (tournament.isStarted) return tournament;
 
     const newParticipant = {
       id: uuidv4(),
@@ -105,11 +111,9 @@ export const db = {
     };
 
     tournament.participants.push(newParticipant);
-    const updatedTournament = assignParticipantsToMatches(tournament);
-    
-    // Update in array
+    tournament.updatedAt = Date.now();
     const index = tournaments.findIndex(t => t.id === tournamentId);
-    tournaments[index] = { ...updatedTournament, updatedAt: Date.now() };
+    tournaments[index] = tournament;
     
     writeTournaments(tournaments);
     return tournaments[index];
@@ -147,13 +151,37 @@ export const db = {
     const tournaments = readTournaments();
     const tournament = tournaments.find(t => t.id === tournamentId);
     if (!tournament) throw new Error('Tournament not found');
+    if (tournament.isStarted) return tournament;
 
     tournament.participants = tournament.participants.filter(p => p.id !== participantId);
-    const updatedTournament = assignParticipantsToMatches(tournament);
-    
     const index = tournaments.findIndex(t => t.id === tournamentId);
-    tournaments[index] = { ...updatedTournament, updatedAt: Date.now() };
+    tournaments[index] = {
+      ...tournament,
+      matches: [],
+      currentRound: 1,
+      totalRounds: 0,
+      updatedAt: Date.now()
+    };
     
+    writeTournaments(tournaments);
+    return tournaments[index];
+  },
+
+  startTournament: async (tournamentId: string): Promise<Tournament> => {
+    const tournaments = readTournaments();
+    const tournament = tournaments.find(t => t.id === tournamentId);
+    if (!tournament) throw new Error('Tournament not found');
+    if (tournament.isStarted) return tournament;
+    if (tournament.participants.length < 2) return tournament;
+
+    const updatedTournament = {
+      ...assignParticipantsToMatches(tournament),
+      isStarted: true,
+      updatedAt: Date.now()
+    };
+
+    const index = tournaments.findIndex(t => t.id === tournamentId);
+    tournaments[index] = updatedTournament;
     writeTournaments(tournaments);
     return tournaments[index];
   },
@@ -212,11 +240,15 @@ export const db = {
       p.gamePoints = 0;
     });
 
-    // Regenerate matches
-    const updatedTournament = assignParticipantsToMatches(tournament);
-    
     const index = tournaments.findIndex(t => t.id === tournamentId);
-    tournaments[index] = { ...updatedTournament, updatedAt: Date.now() };
+    tournaments[index] = {
+      ...tournament,
+      isStarted: false,
+      matches: [],
+      currentRound: 1,
+      totalRounds: 0,
+      updatedAt: Date.now()
+    };
     
     writeTournaments(tournaments);
     return tournaments[index];
@@ -228,7 +260,11 @@ export const db = {
     // Merge - new tournaments with same ID replace old ones
     const mergedMap = new Map<string, Tournament>();
     existingTournaments.forEach(t => mergedMap.set(t.id, t));
-    newTournaments.forEach(t => mergedMap.set(t.id, { ...t, updatedAt: Date.now() }));
+    newTournaments.forEach(t => mergedMap.set(t.id, {
+      ...t,
+      isStarted: t.isStarted ?? (t.matches?.length ?? 0) > 0,
+      updatedAt: Date.now()
+    }));
     
     const merged = Array.from(mergedMap.values());
     writeTournaments(merged);

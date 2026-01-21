@@ -142,6 +142,17 @@ export function TournamentProvider({ children }: { children: React.ReactNode }) 
           break;
         }
 
+        case 'START_TOURNAMENT': {
+          const tournament = await db.startTournament(action.payload);
+          setState(prev => ({
+            ...prev,
+            tournaments: prev.tournaments.map(t =>
+              t.id === tournament.id ? tournament : t
+            )
+          }));
+          break;
+        }
+
         case 'UPDATE_MATCH': {
           const tournament = await db.updateMatch(
             action.payload.tournamentId,
