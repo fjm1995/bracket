@@ -1,6 +1,7 @@
 import React, { memo, useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Match } from '../types/bracket';
+import { isWaitingForWildCard } from '../services/tournamentService';
 import { useTournament } from '../context/TournamentContext';
 
 interface MatchNodeProps {
@@ -24,6 +25,8 @@ export const MatchNode = memo(function MatchNode({
   // Debounced score update - waits 300ms after user stops typing
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
   
+  const pendingScoresRef = useRef<{ participant1Score: number; participant2Score: number } | null>(null);
+
   const handleScoreChange = useCallback((
     participant: 'participant1' | 'participant2', 
     score: number
@@ -32,16 +35,30 @@ export const MatchNode = memo(function MatchNode({
     if (debounceRef.current) {
       clearTimeout(debounceRef.current);
     }
+
+    const currentScores = pendingScoresRef.current ?? {
+      participant1Score: match.participant1Score,
+      participant2Score: match.participant2Score
+    };
+
+    const nextScores = {
+      participant1Score: participant === 'participant1' ? score : currentScores.participant1Score,
+      participant2Score: participant === 'participant2' ? score : currentScores.participant2Score
+    };
+
+    pendingScoresRef.current = nextScores;
     
     // Debounce the dispatch to prevent race conditions
     debounceRef.current = setTimeout(() => {
+      const scoresToSend = pendingScoresRef.current ?? nextScores;
+      pendingScoresRef.current = null;
       dispatch({
         type: 'UPDATE_MATCH',
         payload: {
           tournamentId,
           matchId: match.id,
-          participant1Score: participant === 'participant1' ? score : match.participant1Score,
-          participant2Score: participant === 'participant2' ? score : match.participant2Score
+          participant1Score: scoresToSend.participant1Score,
+          participant2Score: scoresToSend.participant2Score
         }
       });
     }, 300);
@@ -72,6 +89,7 @@ export const MatchNode = memo(function MatchNode({
   const isByeMatch = (match.participant1 && !match.participant2) || (!match.participant1 && match.participant2);
   const isByeComplete = isByeMatch && isComplete; // Bye match that auto-advanced
   const hasWildCard = !!match.wildCardParticipant1 || !!match.wildCardParticipant2;
+  const isWaitingForPlayIn = isWaitingForWildCard(tournament, match);
 
   // Get scoring hint for best-of modes
   const getScoringHint = () => {
@@ -144,7 +162,10 @@ export const MatchNode = memo(function MatchNode({
 
         {/* Participant 2 or Bye Indicator */}
         {isByeMatch && !match.participant2 ? (
-          <ByeSlot isAutoAdvanced={!!isByeComplete} />
+          <ByeSlot 
+            isAutoAdvanced={!!isByeComplete} 
+            isWaitingForPlayIn={isWaitingForPlayIn}
+          />
         ) : (
           <ParticipantRow
             participant={match.participant2}
@@ -191,7 +212,13 @@ export const MatchNode = memo(function MatchNode({
 });
 
 // Bye Slot Component - shows when a player has no opponent
-const ByeSlot = memo(function ByeSlot({ isAutoAdvanced }: { isAutoAdvanced: boolean }) {
+const ByeSlot = memo(function ByeSlot({ 
+  isAutoAdvanced,
+  isWaitingForPlayIn
+}: { 
+  isAutoAdvanced: boolean; 
+  isWaitingForPlayIn: boolean;
+}) {
   return (
     <div className="participant-row bg-purple-50/50 border border-purple-200/50 opacity-60">
       <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -206,7 +233,11 @@ const ByeSlot = memo(function ByeSlot({ isAutoAdvanced }: { isAutoAdvanced: bool
             No opponent
           </span>
           <span className="text-xs text-purple-400 block">
-            {isAutoAdvanced ? 'Bye – Auto-advanced' : 'Bye – Pending'}
+            {isAutoAdvanced 
+              ? 'Bye – Auto-advanced' 
+              : isWaitingForPlayIn 
+                ? 'Awaiting play-in opponent' 
+                : 'Bye – Pending'}
           </span>
         </div>
       </div>

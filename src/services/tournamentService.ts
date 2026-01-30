@@ -3,12 +3,11 @@ import { Tournament, Match, Participant } from '../types/bracket';
 
 /**
  * Tournament Service - Contains all business logic for tournament management
- * Implements single-elimination bracket with standard bye handling
+ * Implements single-elimination bracket with play-in handling for byes
  * 
- * Bye Rule: Byes resolve after all played matches in that round finish.
- * Wild Card Rule: When a round completes, the highest-scoring losers fill
- * any single-participant matches in the next round to keep even pairings.
- * This is the standard approach used in most tournaments (NCAA, Wimbledon, etc.)
+ * Play-In Rule: For any non-championship round, if a match has a single participant,
+ * the highest-scoring loser from that same round is placed into that match before
+ * the round can advance. Remaining byes still auto-advance if no eligible losers exist.
  */
 
 /**
@@ -17,11 +16,11 @@ import { Tournament, Match, Participant } from '../types/bracket';
 export function generateMatchStructure(participantCount: number): Match[] {
   if (participantCount < 2) return [];
   
-  const rounds = Math.ceil(Math.log2(participantCount));
   const matches: Match[] = [];
+  let round = 1;
+  let matchesInRound = Math.ceil(participantCount / 2);
 
-  for (let round = 1; round <= rounds; round++) {
-    const matchesInRound = Math.pow(2, rounds - round);
+  while (matchesInRound >= 1) {
     for (let position = 1; position <= matchesInRound; position++) {
       matches.push({
         id: uuidv4(),
@@ -34,6 +33,10 @@ export function generateMatchStructure(participantCount: number): Match[] {
         winner: null
       });
     }
+
+    if (matchesInRound === 1) break;
+    matchesInRound = Math.ceil(matchesInRound / 2);
+    round++;
   }
 
   return matches;
@@ -54,11 +57,8 @@ export function shuffleArray<T>(array: T[]): T[] {
 /**
  * Assigns participants to first-round matches
  * Supports two seeding modes:
- * - 'random': Shuffle participants randomly, distribute byes evenly (default)
- * - 'seeded': Highest gamePoints get byes (like fantasy football playoffs)
- * 
- * Key invariant: Every Round 2 match must receive at least one participant
- * from Round 1. This is achieved by distributing byes evenly across the bracket.
+ * - 'random': Shuffle participants randomly (default)
+ * - 'seeded': Highest gamePoints get the lone bye when the player count is odd
  */
 export function assignParticipantsToMatches(tournament: Tournament): Tournament {
   const participantCount = tournament.participants.length;
@@ -71,28 +71,23 @@ export function assignParticipantsToMatches(tournament: Tournament): Tournament 
     };
   }
 
-  const totalRounds = Math.ceil(Math.log2(participantCount));
   const matches = generateMatchStructure(participantCount);
   const firstRoundMatches = matches.filter(m => m.round === 1);
+  const totalRounds = matches.reduce((max, match) => Math.max(max, match.round), 0);
   
   // Get participants in the right order based on seeding mode
   const orderedParticipants = tournament.seedingMode === 'seeded'
     ? getSeededParticipants(tournament.participants)
     : shuffleArray([...tournament.participants]);
 
-  // Calculate number of byes needed
-  const bracketSize = Math.pow(2, totalRounds);
-  const byeCount = bracketSize - participantCount;
-
-  if (tournament.seedingMode === 'seeded' && byeCount > 0) {
-    // SEEDED MODE: Highest gamePoints get byes
-    // Standard bracket seeding: Rank 1 vs Rank 8, Rank 4 vs Rank 5, etc.
-    assignSeededParticipants(firstRoundMatches, orderedParticipants, byeCount);
-  } else {
-    // RANDOM MODE: Distribute byes evenly across the bracket
-    // This ensures every R2 match gets at least one participant from R1
-    assignParticipantsWithDistributedByes(firstRoundMatches, orderedParticipants, byeCount);
-  }
+  // Round 1 has at most one bye (when participantCount is odd)
+  const byeCount = (firstRoundMatches.length * 2) - participantCount;
+  assignParticipantsToFirstRoundMatches(
+    firstRoundMatches,
+    orderedParticipants,
+    byeCount,
+    tournament.seedingMode
+  );
 
   return {
     ...tournament,
@@ -103,126 +98,33 @@ export function assignParticipantsToMatches(tournament: Tournament): Tournament 
 }
 
 /**
- * Assigns participants to matches with byes distributed evenly across the bracket.
- * 
- * Key insight: We need to ensure that every R2 match receives at least one participant.
- * This means we need to think in terms of "R2 match feeders" (pairs of R1 matches).
- * 
- * Algorithm:
- * 1. Calculate how many R2 matches we'll have
- * 2. Ensure each R2 match gets at least one participant from its feeder R1 matches
- * 3. Distribute remaining participants to create full matches where possible
- * 
- * This guarantees no empty R2 matches and minimizes single-participant R2 matches.
+ * Assigns participants to the first round.
+ * When participant count is odd, seeded mode gives the top seed the lone bye.
  */
-function assignParticipantsWithDistributedByes(
+function assignParticipantsToFirstRoundMatches(
   matches: Match[],
   participants: Participant[],
-  byeCount: number
+  byeCount: number,
+  seedingMode: 'random' | 'seeded'
 ): void {
-  const matchCount = matches.length;
-  const participantCount = participants.length;
-  
-  // If no byes needed, just fill sequentially
-  if (byeCount === 0) {
-    let participantIndex = 0;
-    for (const match of matches) {
-      match.participant1 = participants[participantIndex++];
-      match.participant2 = participants[participantIndex++];
+  let participantIndex = 0;
+
+  if (seedingMode === 'seeded' && byeCount === 1 && matches.length > 0) {
+    const byeMatch = matches[0];
+    byeMatch.participant1 = participants[participantIndex++] ?? null;
+
+    for (let i = 1; i < matches.length; i++) {
+      const match = matches[i];
+      match.participant1 = participants[participantIndex++] ?? null;
+      match.participant2 = participants[participantIndex++] ?? null;
     }
+
     return;
   }
-  
-  // R2 match count (each pair of R1 matches feeds one R2 match)
-  const r2MatchCount = matchCount / 2;
-  
-  // We need to distribute participants across R1 matches such that:
-  // 1. Every R2 match gets at least one participant (no empty R2 matches)
-  // 2. We maximize full R1 matches (both participants present)
-  // 3. Byes are distributed evenly
-  
-  // Each R2 match needs at least 1 participant from its 2 feeder R1 matches
-  // So we need at least r2MatchCount participants to avoid empty R2 matches
-  // If we have fewer participants than r2MatchCount, we'll have empty R2 matches (unavoidable)
-  
-  // Strategy: 
-  // - First, guarantee each R2 match gets at least one participant
-  // - Then, distribute remaining participants to create full matches
-  
-  // Create an array to track how many participants each R2 match will receive
-  // Each R2 match can receive 0-4 participants (from 2 R1 matches, 2 slots each)
-  const r2Allocations: number[] = new Array(r2MatchCount).fill(0);
-  
-  // First pass: Give each R2 match at least 1 participant (if we have enough)
-  let remainingParticipants = participantCount;
-  for (let i = 0; i < r2MatchCount && remainingParticipants > 0; i++) {
-    r2Allocations[i] = 1;
-    remainingParticipants--;
-  }
-  
-  // Second pass: Give each R2 match a second participant (for a full R2 match)
-  for (let i = 0; i < r2MatchCount && remainingParticipants > 0; i++) {
-    r2Allocations[i]++;
-    remainingParticipants--;
-  }
-  
-  // Third pass: Give each R2 match a third participant (one full R1 match + one bye)
-  for (let i = 0; i < r2MatchCount && remainingParticipants > 0; i++) {
-    r2Allocations[i]++;
-    remainingParticipants--;
-  }
-  
-  // Fourth pass: Give each R2 match a fourth participant (two full R1 matches)
-  for (let i = 0; i < r2MatchCount && remainingParticipants > 0; i++) {
-    r2Allocations[i]++;
-    remainingParticipants--;
-  }
-  
-  // Now assign participants to R1 matches based on allocations
-  let participantIndex = 0;
-  
-  for (let r2Idx = 0; r2Idx < r2MatchCount; r2Idx++) {
-    const allocation = r2Allocations[r2Idx];
-    const match1Idx = r2Idx * 2;     // First R1 match in pair
-    const match2Idx = r2Idx * 2 + 1; // Second R1 match in pair
-    
-    const match1 = matches[match1Idx];
-    const match2 = matches[match2Idx];
-    
-    // Distribute participants based on allocation
-    // Allocation 0: Both R1 matches empty (R2 match will be empty)
-    // Allocation 1: One participant in first R1 match (R2 match gets 1 participant)
-    // Allocation 2: One participant in each R1 match (R2 match gets 2 participants)
-    // Allocation 3: First R1 match full, second has 1 (R2 match gets 2 participants)
-    // Allocation 4: Both R1 matches full (R2 match gets 2 participants)
-    
-    switch (allocation) {
-      case 0:
-        // Empty - nothing to assign
-        break;
-      case 1:
-        // One participant in first match
-        match1.participant1 = participants[participantIndex++];
-        break;
-      case 2:
-        // One participant in each match (distributed byes)
-        match1.participant1 = participants[participantIndex++];
-        match2.participant1 = participants[participantIndex++];
-        break;
-      case 3:
-        // First match full, second has one
-        match1.participant1 = participants[participantIndex++];
-        match1.participant2 = participants[participantIndex++];
-        match2.participant1 = participants[participantIndex++];
-        break;
-      case 4:
-        // Both matches full
-        match1.participant1 = participants[participantIndex++];
-        match1.participant2 = participants[participantIndex++];
-        match2.participant1 = participants[participantIndex++];
-        match2.participant2 = participants[participantIndex++];
-        break;
-    }
+
+  for (const match of matches) {
+    match.participant1 = participants[participantIndex++] ?? null;
+    match.participant2 = participants[participantIndex++] ?? null;
   }
 }
 
@@ -320,7 +222,7 @@ function processRoundByes(matches: Match[], round: number, totalRounds: number):
 /**
  * Checks if all played matches in a round are complete
  */
-function isRoundComplete(matches: Match[], round: number): boolean {
+export function isRoundComplete(matches: Match[], round: number): boolean {
   const roundMatches = matches.filter(m => m.round === round);
   const playedMatches = roundMatches.filter(m => m.participant1 && m.participant2);
 
@@ -328,6 +230,24 @@ function isRoundComplete(matches: Match[], round: number): boolean {
     return roundMatches.some(m => m.participant1 || m.participant2);
   }
 
+  if (!playedMatches.every(m => m.winner)) return false;
+
+  const singleMatches = roundMatches.filter(
+    m => (m.participant1 && !m.participant2) || (!m.participant1 && m.participant2)
+  );
+  if (singleMatches.length === 0) return true;
+
+  const losers = getRoundLosers(matches, round);
+  const hasEligibleLoser = losers.length > 0 && !hasTopLoserTie(losers);
+  if (!hasEligibleLoser) return true;
+
+  return singleMatches.every(m => m.winner);
+}
+
+function isRoundReadyForPlayIn(matches: Match[], round: number): boolean {
+  const roundMatches = matches.filter(m => m.round === round);
+  const playedMatches = roundMatches.filter(m => m.participant1 && m.participant2);
+  if (playedMatches.length === 0) return false;
   return playedMatches.every(m => m.winner);
 }
 
@@ -376,11 +296,36 @@ function clearWildCardsForRound(matches: Match[], round: number): void {
   for (const match of roundMatches) {
     if (match.wildCardParticipant1) {
       match.participant1 = null;
+      match.participant1Score = 0;
       match.wildCardParticipant1 = false;
     }
     if (match.wildCardParticipant2) {
       match.participant2 = null;
+      match.participant2Score = 0;
       match.wildCardParticipant2 = false;
+    }
+  }
+}
+
+/**
+ * Clears play-in assignments for a round, even if the play-in match was completed.
+ */
+function clearPlayInAssignmentsForRound(matches: Match[], round: number): void {
+  const roundMatches = matches.filter(m => m.round === round);
+
+  for (const match of roundMatches) {
+    if (match.wildCardParticipant1) {
+      match.participant1 = null;
+      match.participant1Score = 0;
+      match.wildCardParticipant1 = false;
+    }
+    if (match.wildCardParticipant2) {
+      match.participant2 = null;
+      match.participant2Score = 0;
+      match.wildCardParticipant2 = false;
+    }
+    if (match.winner && (!match.participant1 || !match.participant2)) {
+      match.winner = null;
     }
   }
 }
@@ -422,7 +367,14 @@ type RoundLoser = { participant: Participant; score: number; matchId: string };
  */
 function getRoundLosers(matches: Match[], round: number): RoundLoser[] {
   return matches
-    .filter(m => m.round === round && m.participant1 && m.participant2 && m.winner)
+    .filter(m => 
+      m.round === round && 
+      m.participant1 && 
+      m.participant2 && 
+      m.winner && 
+      !m.wildCardParticipant1 && 
+      !m.wildCardParticipant2
+    )
     .map(m => {
       const winnerIsP1 = m.winner!.id === m.participant1!.id;
       return {
@@ -435,6 +387,11 @@ function getRoundLosers(matches: Match[], round: number): RoundLoser[] {
       if (a.score !== b.score) return b.score - a.score;
       return a.participant.name.localeCompare(b.participant.name);
     });
+}
+
+function hasTopLoserTie(losers: RoundLoser[]): boolean {
+  if (losers.length < 2) return false;
+  return losers[0].score === losers[1].score;
 }
 
 /**
@@ -462,7 +419,7 @@ function advanceWinnerToNextRound(
 
 /**
  * Gets all bye matches (matches with only one participant) in a round
- * Note: With auto-advance, bye matches should already have winners set
+ * Note: Byes can remain pending until a play-in opponent is assigned
  */
 export function getByeMatches(tournament: Tournament, round: number): Match[] {
   return tournament.matches.filter(m => 
@@ -496,7 +453,7 @@ export function getRegularMatches(tournament: Tournament, round: number): Match[
 
 /**
  * Attempts to fill bye matches with wild card opponents
- * Uses highest-scoring losers from completed rounds to fill single-participant matches
+ * Uses highest-scoring losers from the same round to create play-in matches
  */
 export function fillByeMatchesWithWildCards(tournament: Tournament, round?: number): boolean {
   let didFill = false;
@@ -504,18 +461,19 @@ export function fillByeMatchesWithWildCards(tournament: Tournament, round?: numb
   const endRound = round ?? (tournament.totalRounds - 1);
 
   for (let currentRound = startRound; currentRound <= endRound; currentRound++) {
+    if (currentRound >= tournament.totalRounds) continue;
     const roundMatches = tournament.matches.filter(m => m.round === currentRound);
     const activeMatches = roundMatches.filter(m => m.participant1 || m.participant2);
     if (activeMatches.length === 0) continue;
 
-    if (!isRoundComplete(tournament.matches, currentRound)) continue;
+    if (!isRoundReadyForPlayIn(tournament.matches, currentRound)) continue;
 
     const losers = getRoundLosers(tournament.matches, currentRound);
+    if (hasTopLoserTie(losers)) continue;
     const usedLosers = new Set<string>();
-    const nextRoundMatches = tournament.matches.filter(m => m.round === currentRound + 1);
 
-    // Fill single-participant matches with highest scoring losers
-    for (const match of nextRoundMatches) {
+    // Fill single-participant matches in the same round with highest scoring losers
+    for (const match of roundMatches) {
       if (match.winner) continue;
 
       const hasP1 = !!match.participant1;
@@ -543,6 +501,16 @@ export function fillByeMatchesWithWildCards(tournament: Tournament, round?: numb
 }
 
 /**
+ * Recomputes play-in assignments for a round (non-championship only)
+ */
+export function refreshPlayInMatches(tournament: Tournament, round: number): boolean {
+  if (round >= tournament.totalRounds) return false;
+  if ((tournament.finalizedRounds ?? []).includes(round)) return false;
+  clearPlayInAssignmentsForRound(tournament.matches, round);
+  return fillByeMatchesWithWildCards(tournament, round);
+}
+
+/**
  * Finalizes a round once all played matches are complete
  */
 export function finalizeRoundIfComplete(tournament: Tournament, round: number): boolean {
@@ -557,7 +525,6 @@ export function finalizeRoundIfComplete(tournament: Tournament, round: number): 
     advanceRoundWinners(tournament, round);
     processRoundByes(tournament.matches, round, tournament.totalRounds);
     clearWildCardsForRound(tournament.matches, nextRound);
-    fillByeMatchesWithWildCards(tournament, round);
     updateCurrentRound(tournament, round);
   }
 
@@ -601,7 +568,9 @@ export function determineWinner(
       }
       if (participant1Score >= targetScore) return match.participant1;
       if (participant2Score >= targetScore) return match.participant2;
-      return null;
+      if (participant1Score === participant2Score) return null;
+      if (participant1Score === 0 && participant2Score === 0) return null;
+      return participant1Score > participant2Score ? match.participant1 : match.participant2;
 
     default:
       if (participant1Score === participant2Score) return null;
@@ -679,8 +648,11 @@ export function progressWinnerToNextRound(
  * Checks if a match is waiting for a wild card opponent
  */
 export function isWaitingForWildCard(tournament: Tournament, match: Match): boolean {
+  if (match.round >= tournament.totalRounds) return false;
   if (!match.participant1 || !match.participant2) {
-    return !isRoundComplete(tournament.matches, match.round);
+    if (!isRoundComplete(tournament.matches, match.round)) return true;
+    const losers = getRoundLosers(tournament.matches, match.round);
+    return losers.length > 0;
   }
   return false;
 }
@@ -693,14 +665,16 @@ export function getWildCardCandidate(tournament: Tournament, round: number): {
   score: number;
   fromMatch: string;
 } | null {
+  if (round >= tournament.totalRounds) return null;
   const roundMatches = tournament.matches.filter(m => m.round === round);
   const activeMatches = roundMatches.filter(m => m.participant1 || m.participant2);
-  if (activeMatches.length === 0 || !isRoundComplete(tournament.matches, round)) {
+  if (activeMatches.length === 0 || !isRoundReadyForPlayIn(tournament.matches, round)) {
     return null;
   }
 
   const losers = getRoundLosers(tournament.matches, round);
   if (losers.length === 0) return null;
+  if (hasTopLoserTie(losers)) return null;
 
   const candidate = losers[0];
 

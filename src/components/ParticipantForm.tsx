@@ -1,9 +1,9 @@
-import React, { useState, useCallback, useMemo, memo } from 'react';
+import React, { useState, useCallback, useMemo, memo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTournament } from '../context/TournamentContext';
-import { Participant, Tournament } from '../types/bracket';
+import { Participant, Tournament, ScoringMode } from '../types/bracket';
 import { ConfirmModal, InputModal } from './Modal';
-import { validateParticipantName, getParticipantStatus } from '../services/tournamentService';
+import { validateParticipantName, getParticipantStatus, getBestOfDescription } from '../services/tournamentService';
 
 // Wrapper to fix AnimatePresence TypeScript issue with React 19
 const AnimatePresenceWrapper = AnimatePresence as React.FC<{
@@ -122,6 +122,9 @@ export const ParticipantForm = memo(function ParticipantForm({
   const [name, setName] = useState('');
   const [nameError, setNameError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [scoringMode, setScoringMode] = useState<ScoringMode>('higher_score');
+  const [targetScore, setTargetScore] = useState<number>(3);
+  const [settingsSaved, setSettingsSaved] = useState(false);
 
   // Modal states
   const [editModal, setEditModal] = useState<{ isOpen: boolean; participant: Participant | null }>({
@@ -138,6 +141,12 @@ export const ParticipantForm = memo(function ParticipantForm({
     () => state.tournaments.find(t => t.id === tournamentId),
     [state.tournaments, tournamentId]
   );
+
+  useEffect(() => {
+    if (!tournament) return;
+    setScoringMode(tournament.scoringMode);
+    setTargetScore(tournament.targetScore ?? 3);
+  }, [tournament]);
 
   const tournamentStats = useMemo(() => {
     if (!tournament) return null;
@@ -211,6 +220,22 @@ export const ParticipantForm = memo(function ParticipantForm({
     });
   }, [removeModal.participantId, tournamentId, dispatch]);
 
+  const handleSaveSettings = useCallback(async () => {
+    if (!tournament) return;
+    if (tournament.isStarted) return;
+
+    setSettingsSaved(false);
+    await dispatch({
+      type: 'UPDATE_TOURNAMENT_SETTINGS',
+      payload: {
+        tournamentId,
+        scoringMode,
+        targetScore: scoringMode === 'best_of' ? targetScore : undefined
+      }
+    });
+    setSettingsSaved(true);
+  }, [tournament, tournamentId, scoringMode, targetScore, dispatch]);
+
   if (!tournament) return null;
 
   return (
@@ -253,6 +278,108 @@ export const ParticipantForm = memo(function ParticipantForm({
       </div>
 
       <div className="card-body space-y-5">
+        {/* Scoring Settings */}
+        <div className="rounded-apple-lg border border-apple-gray-100 p-4 bg-white">
+          <div className="flex items-center justify-between">
+            <h4 className="text-sm font-semibold text-apple-gray-900">Scoring</h4>
+            {tournament.isStarted && (
+              <span className="text-xs text-apple-gray-400">Locked</span>
+            )}
+          </div>
+          <p className="text-xs text-apple-gray-500 mt-1">
+            Update how winners are determined before the tournament starts.
+          </p>
+
+          <div className="mt-3 space-y-3">
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                disabled={tournament.isStarted}
+                onClick={() => {
+                  setScoringMode('higher_score');
+                  setSettingsSaved(false);
+                }}
+                className={`px-3 py-2 rounded-apple border text-xs font-medium transition-all ${
+                  scoringMode === 'higher_score'
+                    ? 'bg-apple-blue text-white border-apple-blue'
+                    : 'bg-white text-apple-gray-600 border-apple-gray-200 hover:border-apple-gray-300'
+                } ${tournament.isStarted ? 'opacity-60 cursor-not-allowed' : ''}`}
+              >
+                Higher score wins
+              </button>
+              <button
+                type="button"
+                disabled={tournament.isStarted}
+                onClick={() => {
+                  setScoringMode('lower_score');
+                  setSettingsSaved(false);
+                }}
+                className={`px-3 py-2 rounded-apple border text-xs font-medium transition-all ${
+                  scoringMode === 'lower_score'
+                    ? 'bg-apple-blue text-white border-apple-blue'
+                    : 'bg-white text-apple-gray-600 border-apple-gray-200 hover:border-apple-gray-300'
+                } ${tournament.isStarted ? 'opacity-60 cursor-not-allowed' : ''}`}
+              >
+                Lower score wins
+              </button>
+              <button
+                type="button"
+                disabled={tournament.isStarted}
+                onClick={() => {
+                  setScoringMode('best_of');
+                  setSettingsSaved(false);
+                }}
+                className={`px-3 py-2 rounded-apple border text-xs font-medium transition-all ${
+                  scoringMode === 'best_of'
+                    ? 'bg-apple-blue text-white border-apple-blue'
+                    : 'bg-white text-apple-gray-600 border-apple-gray-200 hover:border-apple-gray-300'
+                } ${tournament.isStarted ? 'opacity-60 cursor-not-allowed' : ''}`}
+              >
+                First to X wins
+              </button>
+            </div>
+
+            {scoringMode === 'best_of' && (
+              <div className="flex items-center gap-3">
+                <label className="text-xs text-apple-gray-600">Target</label>
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  min="1"
+                  max="50"
+                  value={targetScore}
+                  disabled={tournament.isStarted}
+                  onChange={(e) => {
+                    const next = Math.max(1, Math.min(50, parseInt(e.target.value) || 1));
+                    setTargetScore(next);
+                    setSettingsSaved(false);
+                  }}
+                  className="input text-xs w-20"
+                />
+                <span className="text-xs text-apple-gray-400">
+                  {getBestOfDescription(targetScore)}
+                </span>
+              </div>
+            )}
+
+            {!tournament.isStarted && (
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleSaveSettings}
+                  className="btn-secondary btn-sm"
+                >
+                  Save Scoring
+                </button>
+                {settingsSaved && (
+                  <span className="text-xs text-apple-green">Saved</span>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* Participant List */}
         <div className="space-y-2 max-h-[380px] overflow-y-auto scrollbar-apple -mx-2 px-2">
           <AnimatePresenceWrapper mode="popLayout">

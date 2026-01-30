@@ -8,6 +8,7 @@ import {
   getCompletedMatches,
   getRegularMatches,
   fillByeMatchesWithWildCards,
+  refreshPlayInMatches,
   getRoundLabel,
   getParticipantStatus,
   validateParticipantName,
@@ -125,6 +126,9 @@ function playMatch(
   match.participant1Score = p1Score;
   match.participant2Score = p2Score;
   match.winner = determineWinner(tournament, match, p1Score, p2Score);
+  if (!match.wildCardParticipant1 && !match.wildCardParticipant2) {
+    refreshPlayInMatches(tournament, match.round);
+  }
 }
 
 /**
@@ -164,45 +168,47 @@ function countEmptyMatches(matches: Match[]): number {
   return matches.filter(m => !m.participant1 && !m.participant2).length;
 }
 
+/**
+ * Computes expected match counts per round for a given participant count.
+ */
+function getExpectedRoundMatchCounts(participantCount: number): number[] {
+  if (participantCount < 2) return [];
+  const counts: number[] = [];
+  let matchesInRound = Math.ceil(participantCount / 2);
+  while (matchesInRound >= 1) {
+    counts.push(matchesInRound);
+    if (matchesInRound === 1) break;
+    matchesInRound = Math.ceil(matchesInRound / 2);
+  }
+  return counts;
+}
+
 // ============================================================================
 // BRACKET STRUCTURE TESTS
 // ============================================================================
 
 describe('Bracket Structure (generateMatchStructure)', () => {
-  test.each([
-    { players: 2, expectedMatches: 1, expectedRounds: 1, r1Matches: 1 },
-    { players: 3, expectedMatches: 3, expectedRounds: 2, r1Matches: 2 },
-    { players: 4, expectedMatches: 3, expectedRounds: 2, r1Matches: 2 },
-    { players: 5, expectedMatches: 7, expectedRounds: 3, r1Matches: 4 },
-    { players: 6, expectedMatches: 7, expectedRounds: 3, r1Matches: 4 },
-    { players: 7, expectedMatches: 7, expectedRounds: 3, r1Matches: 4 },
-    { players: 8, expectedMatches: 7, expectedRounds: 3, r1Matches: 4 },
-    { players: 9, expectedMatches: 15, expectedRounds: 4, r1Matches: 8 },
-    { players: 16, expectedMatches: 15, expectedRounds: 4, r1Matches: 8 },
-    { players: 17, expectedMatches: 31, expectedRounds: 5, r1Matches: 16 },
-    { players: 32, expectedMatches: 31, expectedRounds: 5, r1Matches: 16 },
-    { players: 33, expectedMatches: 63, expectedRounds: 6, r1Matches: 32 },
-    { players: 64, expectedMatches: 63, expectedRounds: 6, r1Matches: 32 },
-    { players: 100, expectedMatches: 127, expectedRounds: 7, r1Matches: 64 },
-    { players: 128, expectedMatches: 127, expectedRounds: 7, r1Matches: 64 },
-  ])('$players players: $expectedMatches matches, $expectedRounds rounds', 
-    ({ players, expectedMatches, expectedRounds, r1Matches }) => {
+  test('2-100 players: expected rounds and matches', () => {
+    for (let players = 2; players <= 100; players++) {
       const matches = generateMatchStructure(players);
-      
+      const expectedRoundCounts = getExpectedRoundMatchCounts(players);
+      const expectedMatches = expectedRoundCounts.reduce((sum, count) => sum + count, 0);
+      const expectedRounds = expectedRoundCounts.length;
+
       expect(matches.length).toBe(expectedMatches);
-      
+
       // Count rounds
       const rounds = new Set(matches.map(m => m.round));
       expect(rounds.size).toBe(expectedRounds);
-      
+
       // Verify round 1 has correct number of matches
       const round1 = matches.filter(m => m.round === 1);
-      expect(round1.length).toBe(r1Matches);
-      
+      expect(round1.length).toBe(expectedRoundCounts[0]);
+
       // Verify final round has exactly 1 match
       const finalRound = matches.filter(m => m.round === expectedRounds);
       expect(finalRound.length).toBe(1);
-      
+
       // Verify each round has half the matches of the previous
       for (let r = 2; r <= expectedRounds; r++) {
         const prevRound = matches.filter(m => m.round === r - 1).length;
@@ -210,7 +216,7 @@ describe('Bracket Structure (generateMatchStructure)', () => {
         expect(thisRound).toBe(Math.ceil(prevRound / 2));
       }
     }
-  );
+  });
 
   test('0 players: no matches', () => {
     expect(generateMatchStructure(0)).toEqual([]);
@@ -230,33 +236,19 @@ describe('Bracket Structure (generateMatchStructure)', () => {
 // ============================================================================
 
 describe('Participant Assignment - Random Mode', () => {
-  // NEW: With distributed bye algorithm, byes are spread evenly across the bracket
-  // This ensures every R2 match gets at least one participant (no empty R2 matches)
-  // Formula: fullMatches = participants - r2MatchCount, byeMatches = r2MatchCount - fullMatches
-  // Where r2MatchCount = bracketSize / 4
-  test.each([
-    { players: 2, fullMatches: 1, byeMatches: 0, emptyMatches: 0 },
-    { players: 3, fullMatches: 1, byeMatches: 1, emptyMatches: 0 },
-    { players: 4, fullMatches: 2, byeMatches: 0, emptyMatches: 0 },
-    { players: 5, fullMatches: 1, byeMatches: 3, emptyMatches: 0 },  // 5 players, 4 R1 matches, 2 R2 matches
-    { players: 6, fullMatches: 2, byeMatches: 2, emptyMatches: 0 },  // 6 players distributed across 4 R1 matches
-    { players: 7, fullMatches: 3, byeMatches: 1, emptyMatches: 0 },
-    { players: 8, fullMatches: 4, byeMatches: 0, emptyMatches: 0 },
-    { players: 9, fullMatches: 1, byeMatches: 7, emptyMatches: 0 },  // 9 players, 8 R1 matches, 4 R2 matches
-    { players: 15, fullMatches: 7, byeMatches: 1, emptyMatches: 0 },
-    { players: 16, fullMatches: 8, byeMatches: 0, emptyMatches: 0 },
-    { players: 33, fullMatches: 1, byeMatches: 31, emptyMatches: 0 }, // 33 players distributed across 32 R1 matches
-    { players: 100, fullMatches: 36, byeMatches: 28, emptyMatches: 0 }, // 100 players, 64 R1 matches, 32 R2 matches
-  ])('$players players: $fullMatches full, $byeMatches byes, $emptyMatches empty',
-    ({ players, fullMatches, byeMatches, emptyMatches }) => {
+  test.each([2, 3, 4, 5, 6, 7, 8, 9, 14, 15, 16, 33, 100])(
+    '%s players: round 1 pairing',
+    (players) => {
       const tournament = createTestTournament(players);
       const result = assignParticipantsToMatches(tournament);
       
       const r1Matches = getRoundMatches(result, 1);
+      const expectedFull = Math.floor(players / 2);
+      const expectedByes = players % 2;
       
-      expect(countFullMatches(r1Matches)).toBe(fullMatches);
-      expect(countByeMatches(r1Matches)).toBe(byeMatches);
-      expect(countEmptyMatches(r1Matches)).toBe(emptyMatches);
+      expect(countFullMatches(r1Matches)).toBe(expectedFull);
+      expect(countByeMatches(r1Matches)).toBe(expectedByes);
+      expect(countEmptyMatches(r1Matches)).toBe(0);
       
       // No auto-advancement at start
       const matchesWithWinners = result.matches.filter(m => m.winner);
@@ -293,7 +285,7 @@ describe('Participant Assignment - Random Mode', () => {
 
 describe('Participant Assignment - Seeded Mode', () => {
   test('top seeds receive byes in seeded mode', () => {
-    // 5 players need 3 byes (bracket size 8)
+    // 5 players need 1 bye in round 1
     const tournament = createTestTournament(5, {
       seedingMode: 'seeded',
       gamePoints: [100, 80, 60, 40, 20] // Clear ranking
@@ -302,19 +294,18 @@ describe('Participant Assignment - Seeded Mode', () => {
     const result = assignParticipantsToMatches(tournament);
     const r1Matches = getRoundMatches(result, 1);
     
-    // With seeded mode, highest gamePoints should get byes
-      const byeMatches = r1Matches.filter(m => 
-        (m.participant1 && !m.participant2) || (!m.participant1 && m.participant2)
-      );
+    const byeMatches = r1Matches.filter(m => 
+      (m.participant1 && !m.participant2) || (!m.participant1 && m.participant2)
+    );
     
-    // The bye participants should be among the top seeds
-    const byeParticipants = byeMatches.map(m => m.participant1 || m.participant2);
-    expect(byeParticipants.length).toBeGreaterThan(0);
+    // Only one bye, and it should be the top seed
+    expect(byeMatches.length).toBe(1);
+    const byePlayer = byeMatches[0].participant1 || byeMatches[0].participant2;
+    expect(byePlayer?.gamePoints).toBe(100);
   });
 
-  test('seeded mode distributes players across bracket with byes', () => {
-    // Note: Seeded mode only applies when byeCount > 0
-    // Use 7 players in an 8-slot bracket (1 bye)
+  test('seeded mode assigns the top seed to the bye', () => {
+    // 7 players means 1 bye in round 1
     const tournament = createTestTournament(7, {
       seedingMode: 'seeded',
       gamePoints: [100, 90, 80, 70, 60, 50, 40]
@@ -414,11 +405,20 @@ describe('Round Finalization', () => {
     
     // Complete the full match
     playMatch(fullMatches[0], 10, 5, tournament);
-    
-    // Finalize
+
+    // Play-in should be created in the same round
+    const playInMatch = r1Matches.find(m => m.wildCardParticipant1 || m.wildCardParticipant2);
+    expect(playInMatch).toBeTruthy();
+    if (!playInMatch) return;
+
+    // Round cannot finalize until play-in is complete
+    expect(finalizeRoundIfComplete(tournament, 1)).toBe(false);
+
+    // Complete the play-in match
+    playMatch(playInMatch, 7, 10, tournament);
     expect(finalizeRoundIfComplete(tournament, 1)).toBe(true);
-    
-    // Final match should have both participants (winner + bye player)
+
+    // Final match should have both participants (winner + play-in winner)
     const final = getRoundMatches(tournament, 2)[0];
     expect(final.participant1).toBeTruthy();
     expect(final.participant2).toBeTruthy();
@@ -456,20 +456,20 @@ describe('Round Finalization', () => {
 // ============================================================================
 
 describe('Wild Card Logic', () => {
-  test('highest-scoring loser fills bye slot after finalization', () => {
-    // With distributed byes, we need more players to have multiple full matches
-    // 6 players: R1 has 2 full matches + 2 bye matches (distributed)
-    const tournament = assignParticipantsToMatches(createTestTournament(6));
+  test('highest-scoring loser fills bye slot in the same round', () => {
+    // 7 players: R1 has 3 full matches + 1 bye
+    const tournament = assignParticipantsToMatches(createTestTournament(7));
     
     const r1Matches = getRoundMatches(tournament, 1);
     const fullMatches = r1Matches.filter(m => m.participant1 && m.participant2);
-    expect(fullMatches.length).toBe(2);
+    expect(fullMatches.length).toBe(3);
     
     // Play matches with different scores - higher loser score should get wildcard
     // Match 0: winner scores 10, loser scores 8
     // Match 1: winner scores 10, loser scores 3
     playMatch(fullMatches[0], 10, 8, tournament);
     playMatch(fullMatches[1], 10, 3, tournament);
+    playMatch(fullMatches[2], 10, 4, tournament);
     
     // Identify the losers and their scores
     const loser0 = fullMatches[0].winner?.id === fullMatches[0].participant1?.id
@@ -479,12 +479,8 @@ describe('Wild Card Logic', () => {
     // Loser from match 0 scored 8 - should be the wild card candidate
     const higherScoringLoserId = loser0?.id;
     
-    // Finalize round 1
-    finalizeRoundIfComplete(tournament, 1);
-    
-    // Check round 2 for wild card assignments
-    const r2Matches = getRoundMatches(tournament, 2);
-    const wildcardMatches = r2Matches.filter(m => 
+    // Check round 1 for wild card assignments
+    const wildcardMatches = r1Matches.filter(m => 
       m.wildCardParticipant1 || m.wildCardParticipant2
     );
     
@@ -505,11 +501,8 @@ describe('Wild Card Logic', () => {
     const r1Matches = getRoundMatches(tournament, 1);
     const fullMatches = r1Matches.filter(m => m.participant1 && m.participant2);
     fullMatches.forEach(match => playMatch(match, 10, 5, tournament));
-    
-    finalizeRoundIfComplete(tournament, 1);
-    
-    const r2Matches = getRoundMatches(tournament, 2);
-    const wildcardMatch = r2Matches.find(m => 
+
+    const wildcardMatch = r1Matches.find(m => 
       m.wildCardParticipant1 || m.wildCardParticipant2
     );
     
@@ -691,16 +684,21 @@ describe('Full Tournament Simulation', () => {
   });
 
   test('tournament with byes completes correctly', () => {
-    // With distributed byes, use 7 players for 3 full matches + 1 bye
+    // 7 players: 3 full matches + 1 bye in round 1
     const tournament = assignParticipantsToMatches(createTestTournament(7));
     expect(tournament.totalRounds).toBe(3);
     
-    // Round 1: 3 full + 1 bye (with distributed byes)
+    // Round 1: 3 full + 1 bye
     const r1Full = getRoundMatches(tournament, 1)
       .filter(m => m.participant1 && m.participant2);
     expect(r1Full.length).toBe(3);
     
     r1Full.forEach(match => playMatch(match, 10, 5, tournament));
+    const r1PlayIn = getRoundMatches(tournament, 1)
+      .find(m => m.wildCardParticipant1 || m.wildCardParticipant2);
+    if (r1PlayIn) {
+      playMatch(r1PlayIn, 12, 8, tournament);
+    }
     finalizeRoundIfComplete(tournament, 1);
     
     // Round 2 should have participants
@@ -908,9 +906,9 @@ describe('Seeded Data Parity (DynamoDB simulation)', () => {
     const tournament = createTestTournament(playerCount);
     const result = assignParticipantsToMatches(tournament);
     
-    const expectedRounds = Math.ceil(Math.log2(playerCount));
-    const bracketSize = Math.pow(2, expectedRounds);
-    const expectedMatches = bracketSize - 1;
+    const expectedRoundCounts = getExpectedRoundMatchCounts(playerCount);
+    const expectedRounds = expectedRoundCounts.length;
+    const expectedMatches = expectedRoundCounts.reduce((sum, count) => sum + count, 0);
     
     // Structure invariants
     expect(result.totalRounds).toBe(expectedRounds);
@@ -930,7 +928,7 @@ describe('Seeded Data Parity (DynamoDB simulation)', () => {
     expect(winnersAtStart.length).toBe(0);
     
     // Round 1 match count correct
-    expect(r1Matches.length).toBe(bracketSize / 2);
+    expect(r1Matches.length).toBe(Math.ceil(playerCount / 2));
   });
 
   test.each(seeds)('seed %i: all game types produce valid brackets', (seed) => {
@@ -942,10 +940,11 @@ describe('Seeded Data Parity (DynamoDB simulation)', () => {
       const tournament = createTournamentFromGameRule(gameName, playerCount);
       const result = assignParticipantsToMatches(tournament);
       
-      const expectedRounds = Math.ceil(Math.log2(playerCount));
+      const expectedRoundCounts = getExpectedRoundMatchCounts(playerCount);
+      const expectedRounds = expectedRoundCounts.length;
       
       expect(result.totalRounds).toBe(expectedRounds);
-      expect(result.matches.length).toBe(Math.pow(2, expectedRounds) - 1);
+      expect(result.matches.length).toBe(expectedRoundCounts.reduce((sum, count) => sum + count, 0));
       
       // Can start playing matches
       const r1Full = getRoundMatches(result, 1)
@@ -1015,42 +1014,23 @@ describe('Edge Cases', () => {
   });
 
   test('one less than power of 2 has exactly 1 bye', () => {
-    // With distributed byes, n-1 players in an n-slot bracket means 1 bye
-    // The bye is distributed to ensure R2 matches are full
+    // Odd player counts produce a single bye in round 1
     [3, 7, 15, 31, 63].forEach(count => {
       const tournament = assignParticipantsToMatches(createTestTournament(count));
       const r1Matches = getRoundMatches(tournament, 1);
       
       expect(countByeMatches(r1Matches)).toBe(1);
-      expect(countEmptyMatches(r1Matches)).toBe(0); // No empty matches with distributed byes
+      expect(countEmptyMatches(r1Matches)).toBe(0);
     });
   });
 
-  test('distributed byes ensure no empty R2 matches', () => {
-    // This is the key invariant of the new algorithm
+  test('round 1 match count aligns with participant count', () => {
     [5, 6, 9, 10, 11, 12, 17, 18, 19, 20, 33, 50, 100].forEach(count => {
       const tournament = assignParticipantsToMatches(createTestTournament(count));
       const r1Matches = getRoundMatches(tournament, 1);
       
-      // No empty R1 matches (byes are distributed, not clustered)
+      expect(r1Matches.length).toBe(Math.ceil(count / 2));
       expect(countEmptyMatches(r1Matches)).toBe(0);
-      
-      // Every R2 match should receive at least one participant
-      // Group R1 matches into pairs and verify each pair has at least one participant
-      const r2MatchCount = r1Matches.length / 2;
-      for (let i = 0; i < r2MatchCount; i++) {
-        const match1 = r1Matches[i * 2];
-        const match2 = r1Matches[i * 2 + 1];
-        const participantsInPair = 
-          (match1.participant1 ? 1 : 0) + 
-          (match1.participant2 ? 1 : 0) + 
-          (match2.participant1 ? 1 : 0) + 
-          (match2.participant2 ? 1 : 0);
-        
-        // Each pair must have at least 2 participants (so R2 match gets 2 winners)
-        // Actually, we need at least 1 participant per pair to avoid empty R2 matches
-        expect(participantsInPair).toBeGreaterThanOrEqual(1);
-      }
     });
   });
 });

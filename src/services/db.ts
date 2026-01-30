@@ -3,7 +3,8 @@ import { Tournament, ScoringMode, SeedingMode } from '../types/bracket';
 import {
   assignParticipantsToMatches,
   determineWinner,
-  finalizeRoundIfComplete
+  finalizeRoundIfComplete,
+  refreshPlayInMatches
 } from './tournamentService';
 
 // API Configuration
@@ -322,8 +323,44 @@ export const db = {
     // Determine winner
     match.winner = determineWinner(tournament, match, participant1Score, participant2Score);
 
+    if (
+      match.round < tournament.totalRounds &&
+      !match.wildCardParticipant1 &&
+      !match.wildCardParticipant2
+    ) {
+      refreshPlayInMatches(tournament, match.round);
+    }
+
     const updatedTournament = {
       ...tournament,
+      updatedAt: Date.now()
+    };
+
+    await apiRequest<Tournament>(`/tournaments/${tournamentId}`, {
+      method: 'PUT',
+      body: JSON.stringify(updatedTournament),
+    });
+
+    return updatedTournament;
+  },
+
+  /**
+   * Update tournament scoring settings (pre-start only)
+   */
+  updateTournamentSettings: async (
+    tournamentId: string,
+    scoringMode: ScoringMode,
+    targetScore?: number
+  ): Promise<Tournament> => {
+    const tournaments = await db.getTournaments();
+    const tournament = tournaments.find(t => t.id === tournamentId);
+    if (!tournament) throw new Error('Tournament not found');
+    if (tournament.isStarted) return tournament;
+
+    const updatedTournament = {
+      ...tournament,
+      scoringMode,
+      targetScore: scoringMode === 'best_of' ? targetScore : undefined,
       updatedAt: Date.now()
     };
 

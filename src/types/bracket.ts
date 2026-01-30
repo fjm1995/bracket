@@ -54,6 +54,7 @@ export type TournamentAction =
   | { type: 'DELETE_TOURNAMENT'; payload: string }
   | { type: 'ADD_PARTICIPANT'; payload: { tournamentId: string; name: string } }
   | { type: 'START_TOURNAMENT'; payload: string }
+  | { type: 'UPDATE_TOURNAMENT_SETTINGS'; payload: { tournamentId: string; scoringMode: ScoringMode; targetScore?: number } }
   | { type: 'UPDATE_MATCH'; payload: { tournamentId: string; matchId: string; participant1Score: number; participant2Score: number } }
   | { type: 'FINALIZE_ROUND'; payload: { tournamentId: string; round: number } }
   | { type: 'SET_ACTIVE_TOURNAMENT'; payload: string | null }

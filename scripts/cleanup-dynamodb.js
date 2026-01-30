@@ -1,11 +1,14 @@
 #!/usr/bin/env node
 /* eslint-disable no-console */
 const { execSync } = require('child_process');
+const fs = require('fs');
+const path = require('path');
 
 const REGION = process.env.AWS_REGION || 'us-east-2';
 const TABLE_NAME = process.env.DYNAMO_TABLE || 'BracketTournaments';
 const DRY_RUN = process.argv.includes('--dry-run');
 const CONFIRM = process.argv.includes('--confirm');
+const SEEDED = process.argv.includes('--seeded');
 
 const NAME_ARG = process.argv.find(arg => arg.startsWith('--name-contains='));
 const TAG_ARG = process.argv.find(arg => arg.startsWith('--seed-tag='));
@@ -13,8 +16,8 @@ const TAG_ARG = process.argv.find(arg => arg.startsWith('--seed-tag='));
 const NAME_CONTAINS = NAME_ARG ? NAME_ARG.split('=')[1] : null;
 const SEED_TAG = TAG_ARG ? TAG_ARG.split('=')[1] : null;
 
-if (!NAME_CONTAINS && !SEED_TAG) {
-  console.error('Error: provide --name-contains or --seed-tag');
+if (!NAME_CONTAINS && !SEED_TAG && !SEEDED) {
+  console.error('Error: provide --name-contains, --seed-tag, or --seeded');
   process.exit(1);
 }
 
@@ -70,21 +73,48 @@ function chunk(items, size) {
   return result;
 }
 
+function loadSeededIds() {
+  const scriptsDir = __dirname;
+  const files = fs.readdirSync(scriptsDir)
+    .filter(name => name.startsWith('.seed-batch-') && name.endsWith('.json'));
+
+  const ids = [];
+
+  files.forEach((file) => {
+    const filePath = path.join(scriptsDir, file);
+    const contents = fs.readFileSync(filePath, 'utf8');
+    const data = JSON.parse(contents);
+    const tableItems = data[TABLE_NAME] || data[Object.keys(data)[0]] || [];
+
+    tableItems.forEach((entry) => {
+      const item = entry && entry.PutRequest && entry.PutRequest.Item;
+      const id = item && item.id && item.id.S;
+      if (id) ids.push(id);
+    });
+  });
+
+  return Array.from(new Set(ids));
+}
+
 function main() {
   let lastKey = null;
   const ids = [];
 
-  do {
-    const cmd = buildScanArgs(lastKey);
-    const output = runAws(cmd);
-    const data = JSON.parse(output);
-    (data.Items || []).forEach(item => {
-      if (item.id && item.id.S) {
-        ids.push(item.id.S);
-      }
-    });
-    lastKey = data.LastEvaluatedKey || null;
-  } while (lastKey);
+  if (SEEDED) {
+    ids.push(...loadSeededIds());
+  } else {
+    do {
+      const cmd = buildScanArgs(lastKey);
+      const output = runAws(cmd);
+      const data = JSON.parse(output);
+      (data.Items || []).forEach(item => {
+        if (item.id && item.id.S) {
+          ids.push(item.id.S);
+        }
+      });
+      lastKey = data.LastEvaluatedKey || null;
+    } while (lastKey);
+  }
 
   console.log(`Found ${ids.length} items to delete from ${TABLE_NAME} (${REGION}).`);
 

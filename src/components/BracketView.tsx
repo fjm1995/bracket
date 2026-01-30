@@ -1,22 +1,30 @@
-import React, { useMemo, memo } from 'react';
+import React, { useMemo, memo, useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useTournament } from '../context/TournamentContext';
 import { MatchNode } from './MatchNode';
 import { Match, Tournament } from '../types/bracket';
-import { canFinalizeRound, getRoundLabel, getByeMatches } from '../services/tournamentService';
+import { canFinalizeRound, getRoundLabel, getByeMatches, isRoundComplete } from '../services/tournamentService';
 
 interface RoundColumnProps {
   round: number;
   matches: Match[];
   tournament: Tournament;
   totalRounds: number;
+  isCollapsed: boolean;
+  isComplete: boolean;
+  onToggleCollapse: (round: number) => void;
+  isStacked: boolean;
 }
 
 const RoundColumn = memo(function RoundColumn({ 
   round, 
   matches, 
   tournament, 
-  totalRounds 
+  totalRounds,
+  isCollapsed,
+  isComplete,
+  onToggleCollapse,
+  isStacked
 }: RoundColumnProps) {
   const roundLabel = getRoundLabel(round, totalRounds);
   const isFinal = round === totalRounds;
@@ -30,25 +38,41 @@ const RoundColumn = memo(function RoundColumn({
   const byeCount = byeMatches.filter(m => m.winner).length; // Count auto-advanced byes
 
   return (
-    <div className="flex flex-col min-w-[320px]">
+    <div className={`flex flex-col ${isStacked ? 'w-full' : isCollapsed ? 'w-[200px]' : 'w-[320px]'}`}>
       {/* Round Header */}
       <div className="bracket-round-header">
-        <h3 className={`font-semibold tracking-tight ${
-          isFinal 
-            ? 'text-xl text-amber-600' 
-            : isSemiFinal 
-            ? 'text-lg text-apple-gray-800'
-            : 'text-base text-apple-gray-700'
-        }`}>
-          {roundLabel}
-        </h3>
-        <p className="text-sm text-apple-gray-400 mt-0.5">
-          {matches.length} match{matches.length !== 1 ? 'es' : ''}
-        </p>
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h3 className={`font-semibold tracking-tight ${
+              isFinal 
+                ? 'text-xl text-amber-600' 
+                : isSemiFinal 
+                ? 'text-lg text-apple-gray-800'
+                : 'text-base text-apple-gray-700'
+            }`}>
+              {roundLabel}
+            </h3>
+            <p className="text-sm text-apple-gray-400 mt-0.5">
+              {matches.length} match{matches.length !== 1 ? 'es' : ''}
+              {isComplete && (
+                <span className="ml-2 text-apple-green">Complete</span>
+              )}
+            </p>
+          </div>
+          {isComplete && (
+            <button
+              type="button"
+              onClick={() => onToggleCollapse(round)}
+              className="btn-ghost btn-sm whitespace-nowrap"
+            >
+              {isCollapsed ? 'Show' : 'Hide'}
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Bye Info Banner - Shows if there are byes in this round */}
-      {round === 1 && byeCount > 0 && (
+      {!isCollapsed && round === 1 && byeCount > 0 && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -73,32 +97,38 @@ const RoundColumn = memo(function RoundColumn({
       )}
 
       {/* Matches */}
-      <div 
-        className="flex flex-col"
-        style={{
-          gap: `${spacingMultiplier * 16}px`,
-          paddingTop: `${(spacingMultiplier - 1) * 32}px`
-        }}
-      >
-        {matches.map((match, index) => (
-          <motion.div
-            key={match.id}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ 
-              duration: 0.4, 
-              delay: index * 0.05,
-              ease: [0.25, 0.1, 0.25, 1]
-            }}
-          >
-            <MatchNode
-              match={match}
-              tournamentId={tournament.id}
-              isFinal={isFinal}
-            />
-          </motion.div>
-        ))}
-      </div>
+      {isCollapsed ? (
+        <div className="text-xs text-apple-gray-500 italic">
+          Matches hidden
+        </div>
+      ) : (
+        <div 
+          className="flex flex-col"
+          style={{
+            gap: `${spacingMultiplier * (isStacked ? 12 : 16)}px`,
+            paddingTop: `${(spacingMultiplier - 1) * (isStacked ? 16 : 32)}px`
+          }}
+        >
+          {matches.map((match, index) => (
+            <motion.div
+              key={match.id}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ 
+                duration: 0.4, 
+                delay: index * 0.05,
+                ease: [0.25, 0.1, 0.25, 1]
+              }}
+            >
+              <MatchNode
+                match={match}
+                tournamentId={tournament.id}
+                isFinal={isFinal}
+              />
+            </motion.div>
+          ))}
+        </div>
+      )}
     </div>
   );
 });
@@ -181,6 +211,23 @@ const EmptyBracketState = memo(function EmptyBracketState({ isStarted }: { isSta
 
 export const BracketView = memo(function BracketView() {
   const { activeTournament, dispatch } = useTournament();
+  const [collapsedRounds, setCollapsedRounds] = useState<Set<number>>(new Set());
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
+  const lastTournamentIdRef = useRef<string | null>(null);
+  const lastAutoCollapseRef = useRef<boolean>(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const mediaQuery = window.matchMedia('(max-width: 768px)');
+    const updateMatches = () => setIsSmallScreen(mediaQuery.matches);
+    updateMatches();
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener('change', updateMatches);
+      return () => mediaQuery.removeEventListener('change', updateMatches);
+    }
+    mediaQuery.addListener(updateMatches);
+    return () => mediaQuery.removeListener(updateMatches);
+  }, []);
 
   // Organize matches by round
   const roundMatches = useMemo(() => {
@@ -199,6 +246,86 @@ export const BracketView = memo(function BracketView() {
         return acc;
       }, {} as Record<number, Match[]>);
   }, [activeTournament]);
+
+  const isTournamentComplete = useMemo(() => {
+    if (!activeTournament) return false;
+    return (activeTournament.finalizedRounds ?? []).includes(activeTournament.totalRounds);
+  }, [activeTournament]);
+
+  const shouldAutoCollapse = isSmallScreen || isTournamentComplete;
+  const shouldStackRounds = true;
+
+  useEffect(() => {
+    if (!activeTournament) return;
+    const tournamentChanged = lastTournamentIdRef.current !== activeTournament.id;
+    const autoCollapseChanged = lastAutoCollapseRef.current !== shouldAutoCollapse;
+
+    if (tournamentChanged || autoCollapseChanged) {
+      if (!shouldAutoCollapse) {
+        setCollapsedRounds(new Set());
+      } else {
+        const next = new Set<number>();
+        Object.keys(roundMatches).forEach((roundKey) => {
+          const roundNumber = Number(roundKey);
+          if (roundNumber !== activeTournament.currentRound &&
+              isRoundComplete(activeTournament.matches, roundNumber)) {
+            next.add(roundNumber);
+          }
+        });
+        setCollapsedRounds(next);
+      }
+    }
+
+    lastTournamentIdRef.current = activeTournament.id;
+    lastAutoCollapseRef.current = shouldAutoCollapse;
+  }, [activeTournament, roundMatches, shouldAutoCollapse]);
+
+  useEffect(() => {
+    if (!activeTournament || !shouldAutoCollapse) return;
+    const previousRound = activeTournament.currentRound - 1;
+    if (previousRound < 1) return;
+
+    setCollapsedRounds((prev) => {
+      const next = new Set(prev);
+      if (isRoundComplete(activeTournament.matches, previousRound)) {
+        next.add(previousRound);
+      }
+      next.delete(activeTournament.currentRound);
+      return next;
+    });
+  }, [activeTournament?.currentRound, shouldAutoCollapse]);
+
+  const rounds = useMemo(() => (
+    Object.keys(roundMatches)
+      .map(Number)
+      .sort((a, b) => a - b)
+  ), [roundMatches]);
+
+  const expandedRoundWidth = 320;
+  const collapsedRoundWidth = 200;
+  const roundGap = 48;
+  const bracketMinWidth = useMemo(() => {
+    if (!activeTournament || shouldStackRounds) return 0;
+    const roundsWidth = rounds.reduce((sum, roundNumber) => {
+      const isComplete = isRoundComplete(activeTournament.matches, roundNumber);
+      const isCollapsed = collapsedRounds.has(roundNumber);
+      return sum + (isComplete && isCollapsed ? collapsedRoundWidth : expandedRoundWidth);
+    }, 0);
+    const gapWidth = rounds.length > 1 ? roundGap * (rounds.length - 1) : 0;
+    return roundsWidth + gapWidth;
+  }, [activeTournament, collapsedRounds, rounds]);
+
+  const handleToggleRound = (roundNumber: number) => {
+    setCollapsedRounds((prev) => {
+      const next = new Set(prev);
+      if (next.has(roundNumber)) {
+        next.delete(roundNumber);
+      } else {
+        next.add(roundNumber);
+      }
+      return next;
+    });
+  };
 
   if (!activeTournament) {
     return (
@@ -319,20 +446,29 @@ export const BracketView = memo(function BracketView() {
 
         {/* Bracket */}
         {activeTournament.isStarted && activeTournament.matches.length > 0 ? (
-          <div className="bracket-scroll -mx-2 px-2">
+          <div className={`${shouldStackRounds ? '' : 'bracket-scroll'} -mx-2 px-2`}>
             <div 
-              className="bracket-rounds"
-              style={{ minWidth: `${Object.keys(roundMatches).length * 360}px` }}
+              className={`${shouldStackRounds ? 'flex flex-col gap-6' : 'bracket-rounds'}`}
+              style={shouldStackRounds ? undefined : { minWidth: `${bracketMinWidth}px` }}
             >
-              {Object.entries(roundMatches).map(([round, matches]) => (
-                <RoundColumn
-                  key={round}
-                  round={parseInt(round)}
-                  matches={matches}
-                  tournament={activeTournament}
-                  totalRounds={activeTournament.totalRounds}
-                />
-              ))}
+              {rounds.map((roundNumber) => {
+                const matches = roundMatches[roundNumber] ?? [];
+                const isComplete = isRoundComplete(activeTournament.matches, roundNumber);
+                const isCollapsed = isComplete && collapsedRounds.has(roundNumber);
+                return (
+                  <RoundColumn
+                    key={roundNumber}
+                    round={roundNumber}
+                    matches={matches}
+                    tournament={activeTournament}
+                    totalRounds={activeTournament.totalRounds}
+                    isCollapsed={isCollapsed}
+                    isComplete={isComplete}
+                    onToggleCollapse={handleToggleRound}
+                    isStacked={shouldStackRounds}
+                  />
+                );
+              })}
             </div>
           </div>
         ) : (

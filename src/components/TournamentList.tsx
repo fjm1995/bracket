@@ -30,7 +30,6 @@ interface TournamentCardProps {
   onSelect: () => void;
   onMinimize: () => void;
   onDelete: () => void;
-  onAddParticipant: () => void;
   onManagePlayers: () => void;
   onStart: () => void;
   onReset: () => void;
@@ -120,11 +119,13 @@ const CompactTournamentCard = memo(function CompactTournamentCard({
 const ActiveTournamentBar = memo(function ActiveTournamentBar({
   tournament,
   onMinimize,
-  onManagePlayers
+  onManagePlayers,
+  onStart
 }: {
   tournament: Tournament;
   onMinimize: () => void;
   onManagePlayers: () => void;
+  onStart: () => void;
 }) {
   const hasWinner = tournament.matches.some(m => m.round === tournament.totalRounds && m.winner);
   const isComplete = (tournament.finalizedRounds ?? []).includes(tournament.totalRounds);
@@ -133,6 +134,19 @@ const ActiveTournamentBar = memo(function ActiveTournamentBar({
     : tournament.matches.length > 0 
       ? (tournament.matches.filter(m => m.winner).length / tournament.matches.length) * 100 
       : 0;
+  const scoringModeLabel = useMemo(() => {
+    switch (tournament.scoringMode) {
+      case 'best_of':
+        return tournament.targetScore ? getBestOfDescription(tournament.targetScore) : 'Best of X';
+      case 'lower_score':
+        return 'Lower wins';
+      case 'higher_score':
+      default:
+        return 'Higher wins';
+    }
+  }, [tournament.scoringMode, tournament.targetScore]);
+
+  const canStart = !tournament.isStarted && tournament.participants.length >= 2;
 
   return (
     <motion.div
@@ -144,7 +158,7 @@ const ActiveTournamentBar = memo(function ActiveTournamentBar({
           : 'bg-white border-apple-gray-200'
       }`}
     >
-      <div className="flex items-center justify-between p-4 gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 gap-3">
         {/* Tournament Info */}
         <div className="flex items-center gap-3 min-w-0 flex-1">
           <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
@@ -167,21 +181,34 @@ const ActiveTournamentBar = memo(function ActiveTournamentBar({
                 <span className="badge-green text-xs">Complete</span>
               )}
             </div>
-            <div className="flex items-center gap-2 text-sm text-apple-gray-500">
+            <div className="flex flex-wrap items-center gap-2 text-sm text-apple-gray-500">
               <span className="badge-blue text-xs">{tournament.game}</span>
+              <span className="badge-gray text-xs">{scoringModeLabel}</span>
               <span>Round {tournament.currentRound}/{tournament.totalRounds}</span>
-              <span>•</span>
-              <span>{Math.round(progress)}%</span>
+              {tournament.isStarted && (
+                <span>{Math.round(progress)}%</span>
+              )}
             </div>
           </div>
         </div>
 
         {/* Actions */}
         <div className="flex items-center gap-2 flex-shrink-0">
+          {!tournament.isStarted && (
+            <button
+              type="button"
+              onClick={onStart}
+              className={`btn-primary btn-sm ${!canStart ? 'opacity-50 cursor-not-allowed' : ''}`}
+              disabled={!canStart}
+              title={canStart ? 'Start tournament' : 'Add at least 2 players to start'}
+            >
+              Start
+            </button>
+          )}
           <button
             onClick={onManagePlayers}
             className="p-2 text-apple-gray-500 hover:text-apple-gray-700 hover:bg-apple-gray-100 rounded-apple transition-colors"
-            title="Manage Players"
+            title="Manage"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
@@ -217,7 +244,6 @@ const TournamentCard = memo(function TournamentCard({
   onSelect,
   onMinimize,
   onDelete,
-  onAddParticipant,
   onManagePlayers,
   onStart,
   onReset
@@ -339,21 +365,12 @@ const TournamentCard = memo(function TournamentCard({
                     : 'Start'
                   }
                 </button>
-                <button
-                  onClick={onAddParticipant}
-                  className="btn-secondary text-sm px-3"
-                  title="Add Player"
-                >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m6-6H6" />
-                  </svg>
-                </button>
               </div>
               <button
                 onClick={onManagePlayers}
                 className="w-full btn-ghost text-sm"
               >
-                Manage Players
+                Manage
               </button>
             </>
           ) : (
@@ -371,7 +388,7 @@ const TournamentCard = memo(function TournamentCard({
                 onClick={onManagePlayers}
                 className="w-full btn-ghost text-sm"
               >
-                Manage Players
+                Manage
               </button>
             </>
           )}
@@ -425,6 +442,12 @@ export function TournamentList() {
   
   const isCustomGame = newTournament.game === 'Custom Game';
 
+  useEffect(() => {
+    if (activeTournament) {
+      setShowOtherTournaments(false);
+    }
+  }, [activeTournament]);
+
   // Modal states
   const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; tournamentId: string | null }>({
     isOpen: false,
@@ -434,15 +457,10 @@ export function TournamentList() {
     isOpen: false,
     tournamentId: null
   });
-  const [addParticipantModal, setAddParticipantModal] = useState<{ isOpen: boolean; tournamentId: string | null }>({
-    isOpen: false,
-    tournamentId: null
-  });
   const [managePlayersModal, setManagePlayersModal] = useState<{ isOpen: boolean; tournamentId: string | null }>({
     isOpen: false,
     tournamentId: null
   });
-  const [participantError, setParticipantError] = useState<string | undefined>(undefined);
   const [studentName, setStudentName] = useState('');
   const [studentTournamentId, setStudentTournamentId] = useState<string>('');
   const [studentError, setStudentError] = useState<string | null>(null);
@@ -524,30 +542,6 @@ export function TournamentList() {
     }
   }, [resetModal.tournamentId, dispatch]);
 
-  const handleAddParticipant = useCallback(async (name: string) => {
-    if (!addParticipantModal.tournamentId) return;
-
-    const tournament = state.tournaments.find(t => t.id === addParticipantModal.tournamentId);
-    if (!tournament) return;
-    if (tournament.isStarted) {
-      setParticipantError('Registration is closed for this tournament.');
-      return;
-    }
-
-    const validation = validateParticipantName(name, tournament.participants);
-    if (!validation.valid) {
-      setParticipantError(validation.error);
-      return;
-    }
-
-    await dispatch({
-      type: 'ADD_PARTICIPANT',
-      payload: { tournamentId: addParticipantModal.tournamentId, name }
-    });
-    setAddParticipantModal({ isOpen: false, tournamentId: null });
-    setParticipantError(undefined);
-  }, [addParticipantModal.tournamentId, state.tournaments, dispatch]);
-
   const handleStartTournament = useCallback(async (tournamentId: string) => {
     const tournament = state.tournaments.find(t => t.id === tournamentId);
     if (!tournament || tournament.isStarted || tournament.participants.length < 2) return;
@@ -605,6 +599,7 @@ export function TournamentList() {
           tournament={activeTournament}
           onMinimize={() => dispatch({ type: 'SET_ACTIVE_TOURNAMENT', payload: null })}
           onManagePlayers={() => setManagePlayersModal({ isOpen: true, tournamentId: activeTournament.id })}
+          onStart={() => handleStartTournament(activeTournament.id)}
         />
 
         {/* Other Tournaments (Collapsible) */}
@@ -673,8 +668,8 @@ export function TournamentList() {
         <Modal
           isOpen={managePlayersModal.isOpen}
           onClose={() => setManagePlayersModal({ isOpen: false, tournamentId: null })}
-          title={manageTournament ? `Manage Players — ${manageTournament.name}` : 'Manage Players'}
-          size="lg"
+          title={manageTournament ? `Manage — ${manageTournament.name}` : 'Manage'}
+          size="md"
         >
           {manageTournament ? (
             <ParticipantForm tournamentId={manageTournament.id} variant="modal" />
@@ -999,7 +994,6 @@ export function TournamentList() {
                 onSelect={() => dispatch({ type: 'SET_ACTIVE_TOURNAMENT', payload: tournament.id })}
                 onMinimize={() => dispatch({ type: 'SET_ACTIVE_TOURNAMENT', payload: null })}
                 onDelete={() => setDeleteModal({ isOpen: true, tournamentId: tournament.id })}
-                onAddParticipant={() => setAddParticipantModal({ isOpen: true, tournamentId: tournament.id })}
                 onManagePlayers={() => setManagePlayersModal({ isOpen: true, tournamentId: tournament.id })}
                 onStart={() => handleStartTournament(tournament.id)}
                 onReset={() => setResetModal({ isOpen: true, tournamentId: tournament.id })}
@@ -1056,25 +1050,11 @@ export function TournamentList() {
         variant="warning"
       />
 
-      <InputModal
-        isOpen={addParticipantModal.isOpen}
-        onClose={() => {
-          setAddParticipantModal({ isOpen: false, tournamentId: null });
-          setParticipantError(undefined);
-        }}
-        onSubmit={handleAddParticipant}
-        title="Add Participant"
-        label="Player Name"
-        placeholder="Enter player name"
-        submitText="Add"
-        error={participantError}
-      />
-
       <Modal
         isOpen={managePlayersModal.isOpen}
         onClose={() => setManagePlayersModal({ isOpen: false, tournamentId: null })}
-        title={manageTournament ? `Manage Players — ${manageTournament.name}` : 'Manage Players'}
-        size="lg"
+        title={manageTournament ? `Manage — ${manageTournament.name}` : 'Manage'}
+        size="md"
       >
         {manageTournament ? (
           <ParticipantForm tournamentId={manageTournament.id} variant="modal" />
