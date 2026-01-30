@@ -1,34 +1,62 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Tournament, ScoringMode } from '../types/bracket';
+import { Tournament, ScoringMode, SeedingMode } from '../types/bracket';
 import {
   assignParticipantsToMatches,
   determineWinner,
-  progressWinnerToNextRound
+  finalizeRoundIfComplete
 } from './tournamentService';
 
+// API Configuration
+const API_BASE_URL = 'https://1ajifbu21d.execute-api.us-east-2.amazonaws.com/prod';
+
+// Local storage keys for fallback/caching
 const STORAGE_KEY = 'tournaments';
 const ACTIVE_TOURNAMENT_KEY = 'activeTournamentId';
 
-function readTournaments(): Tournament[] {
-  try {
-    const data = localStorage.getItem(STORAGE_KEY);
-    const tournaments: Tournament[] = data ? JSON.parse(data) : [];
-    return tournaments.map(tournament => ({
-      ...tournament,
-      isStarted: tournament.isStarted ?? (tournament.matches?.length ?? 0) > 0
-    }));
-  } catch (error) {
-    console.error('Error reading from localStorage:', error);
-    return [];
+/**
+ * API helper for making requests
+ */
+async function apiRequest<T>(
+  endpoint: string, 
+  options: RequestInit = {}
+): Promise<T> {
+  const url = `${API_BASE_URL}${endpoint}`;
+  
+  const response = await fetch(url, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`API Error: ${response.status} ${response.statusText}`);
   }
+
+  return response.json();
 }
 
-function writeTournaments(tournaments: Tournament[]): void {
+/**
+ * Cache tournaments locally for offline access
+ */
+function cacheLocally(tournaments: Tournament[]): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(tournaments));
   } catch (error) {
-    console.error('Error writing to localStorage:', error);
-    throw error;
+    console.warn('Failed to cache locally:', error);
+  }
+}
+
+/**
+ * Get cached tournaments from localStorage
+ */
+function getCachedTournaments(): Tournament[] {
+  try {
+    const data = localStorage.getItem(STORAGE_KEY);
+    return data ? JSON.parse(data) : [];
+  } catch {
+    return [];
   }
 }
 
@@ -53,53 +81,82 @@ export function setActiveTournamentId(id: string | null): void {
 }
 
 export const db = {
+  /**
+   * Get all tournaments from DynamoDB
+   */
   getTournaments: async (): Promise<Tournament[]> => {
-    // Simulate async for consistency
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(readTournaments());
-      }, 100);
-    });
+    try {
+      const tournaments = await apiRequest<Tournament[]>('/tournaments');
+      // Normalize tournaments with default values for new fields
+      const normalized = tournaments.map(tournament => ({
+        ...tournament,
+        isStarted: tournament.isStarted ?? (tournament.matches?.length ?? 0) > 0,
+        seedingMode: tournament.seedingMode ?? 'random', // Default for existing tournaments
+        finalizedRounds: tournament.finalizedRounds ?? []
+      }));
+      // Cache locally for offline access
+      cacheLocally(normalized);
+      return normalized;
+    } catch (error) {
+      console.warn('API unavailable, using cached data:', error);
+      // Fallback to local cache if API is unavailable
+      return getCachedTournaments();
+    }
   },
 
+  /**
+   * Create a new tournament
+   */
   createTournament: async (tournament: {
     name: string;
     game: string;
     scoringMode: ScoringMode;
     scoreLabel: string;
     targetScore?: number;
+    seedingMode?: SeedingMode;
   }): Promise<Tournament> => {
-    const tournaments = readTournaments();
     const now = Date.now();
     const newTournament: Tournament = {
       id: uuidv4(),
       ...tournament,
+      seedingMode: tournament.seedingMode || 'random', // Default to random
       isStarted: false,
       participants: [],
       matches: [],
       currentRound: 1,
       totalRounds: 0,
+      finalizedRounds: [],
       createdAt: now,
       updatedAt: now
     };
-    tournaments.push(newTournament);
-    writeTournaments(tournaments);
+
+    await apiRequest<Tournament>('/tournaments', {
+      method: 'POST',
+      body: JSON.stringify(newTournament),
+    });
+
     return newTournament;
   },
 
+  /**
+   * Delete a tournament
+   */
   deleteTournament: async (id: string): Promise<void> => {
-    const tournaments = readTournaments();
-    const filteredTournaments = tournaments.filter(t => t.id !== id);
-    writeTournaments(filteredTournaments);
-    
+    await apiRequest(`/tournaments/${id}`, {
+      method: 'DELETE',
+    });
+
     // Clear active tournament if it was deleted
     if (getActiveTournamentId() === id) {
       setActiveTournamentId(null);
     }
   },
 
+  /**
+   * Add a participant to a tournament
+   */
   addParticipant: async (tournamentId: string, name: string): Promise<Tournament> => {
-    const tournaments = readTournaments();
+    const tournaments = await db.getTournaments();
     const tournament = tournaments.find(t => t.id === tournamentId);
     if (!tournament) throw new Error('Tournament not found');
     if (tournament.isStarted) return tournament;
@@ -110,89 +167,132 @@ export const db = {
       gamePoints: 0
     };
 
-    tournament.participants.push(newParticipant);
-    tournament.updatedAt = Date.now();
-    const index = tournaments.findIndex(t => t.id === tournamentId);
-    tournaments[index] = tournament;
-    
-    writeTournaments(tournaments);
-    return tournaments[index];
+    const updatedTournament = {
+      ...tournament,
+      participants: [...tournament.participants, newParticipant],
+      updatedAt: Date.now()
+    };
+
+    await apiRequest<Tournament>(`/tournaments/${tournamentId}`, {
+      method: 'PUT',
+      body: JSON.stringify(updatedTournament),
+    });
+
+    return updatedTournament;
   },
 
-  updateParticipant: async (tournamentId: string, participantId: string, name: string): Promise<Tournament> => {
-    const tournaments = readTournaments();
+  /**
+   * Update a participant's name
+   */
+  updateParticipant: async (
+    tournamentId: string, 
+    participantId: string, 
+    name: string
+  ): Promise<Tournament> => {
+    const tournaments = await db.getTournaments();
     const tournament = tournaments.find(t => t.id === tournamentId);
     if (!tournament) throw new Error('Tournament not found');
 
     const participant = tournament.participants.find(p => p.id === participantId);
     if (!participant) throw new Error('Participant not found');
 
-    participant.name = name.trim();
-    
+    // Update participant name
+    const updatedParticipants = tournament.participants.map(p =>
+      p.id === participantId ? { ...p, name: name.trim() } : p
+    );
+
     // Update participant name in all matches
-    tournament.matches.forEach(match => {
-      if (match.participant1?.id === participantId) {
-        match.participant1.name = name.trim();
-      }
-      if (match.participant2?.id === participantId) {
-        match.participant2.name = name.trim();
-      }
-      if (match.winner?.id === participantId) {
-        match.winner.name = name.trim();
-      }
+    const updatedMatches = tournament.matches.map(match => ({
+      ...match,
+      participant1: match.participant1?.id === participantId 
+        ? { ...match.participant1, name: name.trim() } 
+        : match.participant1,
+      participant2: match.participant2?.id === participantId 
+        ? { ...match.participant2, name: name.trim() } 
+        : match.participant2,
+      winner: match.winner?.id === participantId 
+        ? { ...match.winner, name: name.trim() } 
+        : match.winner,
+    }));
+
+    const updatedTournament = {
+      ...tournament,
+      participants: updatedParticipants,
+      matches: updatedMatches,
+      updatedAt: Date.now()
+    };
+
+    await apiRequest<Tournament>(`/tournaments/${tournamentId}`, {
+      method: 'PUT',
+      body: JSON.stringify(updatedTournament),
     });
-    
-    tournament.updatedAt = Date.now();
-    writeTournaments(tournaments);
-    return tournament;
+
+    return updatedTournament;
   },
 
-  removeParticipant: async (tournamentId: string, participantId: string): Promise<Tournament> => {
-    const tournaments = readTournaments();
+  /**
+   * Remove a participant
+   */
+  removeParticipant: async (
+    tournamentId: string, 
+    participantId: string
+  ): Promise<Tournament> => {
+    const tournaments = await db.getTournaments();
     const tournament = tournaments.find(t => t.id === tournamentId);
     if (!tournament) throw new Error('Tournament not found');
     if (tournament.isStarted) return tournament;
 
-    tournament.participants = tournament.participants.filter(p => p.id !== participantId);
-    const index = tournaments.findIndex(t => t.id === tournamentId);
-    tournaments[index] = {
+    const updatedTournament = {
       ...tournament,
+      participants: tournament.participants.filter(p => p.id !== participantId),
       matches: [],
       currentRound: 1,
       totalRounds: 0,
       updatedAt: Date.now()
     };
-    
-    writeTournaments(tournaments);
-    return tournaments[index];
+
+    await apiRequest<Tournament>(`/tournaments/${tournamentId}`, {
+      method: 'PUT',
+      body: JSON.stringify(updatedTournament),
+    });
+
+    return updatedTournament;
   },
 
+  /**
+   * Start a tournament
+   */
   startTournament: async (tournamentId: string): Promise<Tournament> => {
-    const tournaments = readTournaments();
+    const tournaments = await db.getTournaments();
     const tournament = tournaments.find(t => t.id === tournamentId);
     if (!tournament) throw new Error('Tournament not found');
     if (tournament.isStarted) return tournament;
     if (tournament.participants.length < 2) return tournament;
 
-    const updatedTournament = {
+    const startedTournament = {
       ...assignParticipantsToMatches(tournament),
       isStarted: true,
       updatedAt: Date.now()
     };
 
-    const index = tournaments.findIndex(t => t.id === tournamentId);
-    tournaments[index] = updatedTournament;
-    writeTournaments(tournaments);
-    return tournaments[index];
+    await apiRequest<Tournament>(`/tournaments/${tournamentId}`, {
+      method: 'PUT',
+      body: JSON.stringify(startedTournament),
+    });
+
+    return startedTournament;
   },
 
+  /**
+   * Update a match score
+   */
   updateMatch: async (
     tournamentId: string,
     matchId: string,
     participant1Score: number,
     participant2Score: number
   ): Promise<Tournament> => {
-    const tournaments = readTournaments();
+    const tournaments = await db.getTournaments();
     const tournament = tournaments.find(t => t.id === tournamentId);
     if (!tournament) throw new Error('Tournament not found');
 
@@ -222,57 +322,113 @@ export const db = {
     // Determine winner
     match.winner = determineWinner(tournament, match, participant1Score, participant2Score);
 
-    // Progress winner to next round
-    progressWinnerToNextRound(tournament, match);
+    const updatedTournament = {
+      ...tournament,
+      updatedAt: Date.now()
+    };
 
-    tournament.updatedAt = Date.now();
-    writeTournaments(tournaments);
-    return tournament;
+    await apiRequest<Tournament>(`/tournaments/${tournamentId}`, {
+      method: 'PUT',
+      body: JSON.stringify(updatedTournament),
+    });
+
+    return updatedTournament;
   },
 
+  /**
+   * Finalize a round (manual action)
+   */
+  finalizeRound: async (
+    tournamentId: string,
+    round: number
+  ): Promise<Tournament> => {
+    const tournaments = await db.getTournaments();
+    const tournament = tournaments.find(t => t.id === tournamentId);
+    if (!tournament) throw new Error('Tournament not found');
+
+    const didFinalize = finalizeRoundIfComplete(tournament, round);
+    if (!didFinalize) return tournament;
+
+    const updatedTournament = {
+      ...tournament,
+      updatedAt: Date.now()
+    };
+
+    await apiRequest<Tournament>(`/tournaments/${tournamentId}`, {
+      method: 'PUT',
+      body: JSON.stringify(updatedTournament),
+    });
+
+    return updatedTournament;
+  },
+
+  /**
+   * Reset a tournament
+   */
   resetTournament: async (tournamentId: string): Promise<Tournament> => {
-    const tournaments = readTournaments();
+    const tournaments = await db.getTournaments();
     const tournament = tournaments.find(t => t.id === tournamentId);
     if (!tournament) throw new Error('Tournament not found');
 
     // Reset all participant points
-    tournament.participants.forEach(p => {
-      p.gamePoints = 0;
-    });
+    const resetParticipants = tournament.participants.map(p => ({
+      ...p,
+      gamePoints: 0
+    }));
 
-    const index = tournaments.findIndex(t => t.id === tournamentId);
-    tournaments[index] = {
+    const resetTournament = {
       ...tournament,
+      participants: resetParticipants,
       isStarted: false,
       matches: [],
       currentRound: 1,
       totalRounds: 0,
+      finalizedRounds: [],
       updatedAt: Date.now()
     };
-    
-    writeTournaments(tournaments);
-    return tournaments[index];
+
+    await apiRequest<Tournament>(`/tournaments/${tournamentId}`, {
+      method: 'PUT',
+      body: JSON.stringify(resetTournament),
+    });
+
+    return resetTournament;
   },
 
+  /**
+   * Import tournaments (merge with existing)
+   */
   importTournaments: async (newTournaments: Tournament[]): Promise<Tournament[]> => {
-    const existingTournaments = readTournaments();
+    const existingTournaments = await db.getTournaments();
     
     // Merge - new tournaments with same ID replace old ones
     const mergedMap = new Map<string, Tournament>();
     existingTournaments.forEach(t => mergedMap.set(t.id, t));
-    newTournaments.forEach(t => mergedMap.set(t.id, {
-      ...t,
-      isStarted: t.isStarted ?? (t.matches?.length ?? 0) > 0,
-      updatedAt: Date.now()
-    }));
     
-    const merged = Array.from(mergedMap.values());
-    writeTournaments(merged);
-    return merged;
+    for (const t of newTournaments) {
+      const normalized = {
+        ...t,
+        isStarted: t.isStarted ?? (t.matches?.length ?? 0) > 0,
+      finalizedRounds: t.finalizedRounds ?? [],
+        updatedAt: Date.now()
+      };
+      mergedMap.set(t.id, normalized);
+      
+      // Save each to DynamoDB
+      await apiRequest<Tournament>('/tournaments', {
+        method: 'POST',
+        body: JSON.stringify(normalized),
+      });
+    }
+    
+    return Array.from(mergedMap.values());
   },
 
+  /**
+   * Export tournaments
+   */
   exportTournaments: async (): Promise<string> => {
-    const tournaments = readTournaments();
+    const tournaments = await db.getTournaments();
     return JSON.stringify(tournaments, null, 2);
   }
 };

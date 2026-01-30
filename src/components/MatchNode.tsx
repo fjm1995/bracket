@@ -9,7 +9,11 @@ interface MatchNodeProps {
   isFinal?: boolean;
 }
 
-export const MatchNode = memo(function MatchNode({ match, tournamentId, isFinal = false }: MatchNodeProps) {
+export const MatchNode = memo(function MatchNode({ 
+  match, 
+  tournamentId, 
+  isFinal = false 
+}: MatchNodeProps) {
   const { state, dispatch } = useTournament();
   
   const tournament = useMemo(() => 
@@ -17,7 +21,10 @@ export const MatchNode = memo(function MatchNode({ match, tournamentId, isFinal 
     [state.tournaments, tournamentId]
   );
 
-  const handleScoreChange = useCallback((participant: 'participant1' | 'participant2', score: string) => {
+  const handleScoreChange = useCallback((
+    participant: 'participant1' | 'participant2', 
+    score: string
+  ) => {
     const numScore = Math.max(0, parseInt(score) || 0);
     
     dispatch({
@@ -33,184 +40,247 @@ export const MatchNode = memo(function MatchNode({ match, tournamentId, isFinal 
 
   if (!tournament) return null;
 
+  // Don't render empty matches (no participants at all)
+  if (!match.participant1 && !match.participant2) return null;
+
   const { scoringMode, targetScore, scoreLabel } = tournament;
   
-  const isComplete = match.winner !== null;
+  const isComplete = match.winner != null;
   const p1Score = match.participant1Score;
   const p2Score = match.participant2Score;
-  const isTie = p1Score === p2Score && (p1Score > 0 || p2Score > 0);
   const p1IsWinner = match.winner?.id === match.participant1?.id;
   const p2IsWinner = match.winner?.id === match.participant2?.id;
+  const hasBothParticipants = match.participant1 && match.participant2;
+  const isByeMatch = (match.participant1 && !match.participant2) || (!match.participant1 && match.participant2);
+  const isByeComplete = isByeMatch && isComplete; // Bye match that auto-advanced
+  const hasWildCard = !!match.wildCardParticipant1 || !!match.wildCardParticipant2;
 
-  // Get status message
-  const getStatusMessage = () => {
-    if (match.winner) {
-      return `🏆 ${match.winner.name} wins!`;
+  // Get scoring hint for best-of modes
+  const getScoringHint = () => {
+    if (scoringMode === 'best_of' && targetScore) {
+      return `First to ${targetScore}`;
     }
-    
-    if (p1Score === 0 && p2Score === 0) {
-      return null;
+    if (scoringMode === 'lower_score') {
+      return 'Lower wins';
     }
-
-    switch (scoringMode) {
-      case 'best_of':
-        if (targetScore) {
-          const p1Needed = targetScore - p1Score;
-          const p2Needed = targetScore - p2Score;
-          if (p1Needed > 0 && p2Needed > 0) {
-            return `${match.participant1?.name} needs ${p1Needed}, ${match.participant2?.name} needs ${p2Needed}`;
-          }
-        }
-        return isTie ? 'Tied — Continue playing' : null;
-      
-      case 'lower_score':
-        return isTie ? 'Tied — Enter different positions' : null;
-      
-      case 'higher_score':
-      default:
-        return isTie ? 'Tied — Enter different scores' : null;
-    }
+    return null;
   };
 
-  // Get helper text for scoring mode
-  const getScoringHelp = () => {
-    switch (scoringMode) {
-      case 'best_of':
-        return targetScore ? `First to ${targetScore} ${scoreLabel.toLowerCase()}` : null;
-      case 'lower_score':
-        return 'Lower position wins';
-      default:
-        return null;
-    }
-  };
+  const scoringHint = getScoringHint();
 
-  const statusMessage = getStatusMessage();
-  const scoringHelp = getScoringHelp();
+  // Card classes based on state
+  const cardClasses = `
+    ${isFinal ? 'match-card-final' : isComplete ? 'match-card-complete' : 'match-card'}
+    ${isComplete && !isFinal ? 'winner-glow' : ''}
+    ${hasWildCard ? 'match-card-wildcard' : ''}
+  `;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      className={`match-card bg-white rounded-xl border overflow-hidden shadow-sm
-        ${isFinal ? 'border-yellow-400 shadow-md' : 'border-gray-200'}
-        ${isComplete && !isTie ? 'ring-2 ring-green-400/50' : ''}`}
-    >
+    <div className={cardClasses}>
+      {/* Final Match Header */}
       {isFinal && (
-        <div className="bg-gradient-to-r from-yellow-100 to-amber-100 px-3 py-1 text-center border-b border-yellow-200">
-          <span className="text-xs font-bold text-yellow-700 tracking-wider">CHAMPIONSHIP</span>
+        <div className="px-4 py-2 bg-gradient-to-r from-amber-100 to-amber-50 border-b border-amber-200/50">
+          <div className="flex items-center justify-center gap-2">
+            <svg className="w-4 h-4 text-amber-600" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M5 3h14v2h-1v2.6a6.5 6.5 0 01-2.1 4.78L12 16.28l-3.9-3.9A6.5 6.5 0 016 7.6V5H5V3z"/>
+            </svg>
+            <span className="text-xs font-bold text-amber-700 uppercase tracking-wider">
+              Championship
+            </span>
+          </div>
         </div>
       )}
 
-      <div className="p-3 space-y-2">
-        {/* Participant 1 */}
-        <div
-          className={`flex items-center justify-between p-2 rounded-lg transition-all
-            ${p1IsWinner ? 'bg-green-50 border border-green-300' : 
-              match.participant1 ? 'bg-gray-50 border border-gray-200' : 'bg-gray-50/50 border border-gray-100'}`}
-        >
-          <div className="flex items-center space-x-2 flex-1 min-w-0">
-            {p1IsWinner && (
-              <span className="text-green-500 flex-shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-              </span>
-            )}
-            <span 
-              className={`font-medium truncate ${
-                match.participant1 
-                  ? p1IsWinner ? 'text-green-700' : 'text-gray-900'
-                  : 'text-gray-400 italic'
-              }`}
-              title={match.participant1?.name || 'TBD'}
-            >
-              {match.participant1?.name || 'TBD'}
+      {/* Bye Match Header */}
+      {isByeComplete && (
+        <div className="px-4 py-2 bg-gradient-to-r from-purple-100 to-purple-50 border-b border-purple-200/50">
+          <div className="flex items-center justify-center gap-2">
+            <svg className="w-4 h-4 text-purple-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+            </svg>
+            <span className="text-xs font-bold text-purple-700 uppercase tracking-wider">
+              Bye – Auto-Advanced
             </span>
           </div>
-          <div className="flex items-center space-x-1 flex-shrink-0">
-            <input
-              type="number"
-              min="0"
-              value={match.participant1Score || ''}
-              onChange={(e) => handleScoreChange('participant1', e.target.value)}
-              className="w-14 text-center bg-white border border-gray-300 rounded-md 
-                       text-gray-900 text-sm py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                       disabled:opacity-40 disabled:cursor-not-allowed disabled:bg-gray-100"
-              disabled={!match.participant1}
-              placeholder="0"
-            />
-            <span className="text-xs text-gray-500 w-8">{scoreLabel.slice(0, 3)}</span>
-          </div>
         </div>
+      )}
+
+      <div className="p-3 sm:p-4">
+        {/* Participant 1 */}
+        <ParticipantRow
+          participant={match.participant1}
+          score={p1Score}
+          isWinner={p1IsWinner}
+          isDisabled={!match.participant1 || !hasBothParticipants}
+          scoreLabel={scoreLabel}
+          onScoreChange={(score) => handleScoreChange('participant1', score)}
+          isWildCard={!!match.wildCardParticipant1}
+        />
 
         {/* VS Divider */}
-        <div className="flex items-center justify-center">
-          <div className="flex-1 h-px bg-gray-200"></div>
-          <span className="px-3 text-xs font-bold text-gray-400">VS</span>
-          <div className="flex-1 h-px bg-gray-200"></div>
+        <div className="flex items-center gap-3 my-3">
+          <div className="flex-1 h-px bg-apple-gray-200" />
+          <span className="text-xs font-bold text-apple-gray-300 uppercase">vs</span>
+          <div className="flex-1 h-px bg-apple-gray-200" />
         </div>
 
-        {/* Participant 2 */}
-        <div
-          className={`flex items-center justify-between p-2 rounded-lg transition-all
-            ${p2IsWinner ? 'bg-green-50 border border-green-300' : 
-              match.participant2 ? 'bg-gray-50 border border-gray-200' : 'bg-gray-50/50 border border-gray-100'}`}
-        >
-          <div className="flex items-center space-x-2 flex-1 min-w-0">
-            {p2IsWinner && (
-              <span className="text-green-500 flex-shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-              </span>
-            )}
-            <span 
-              className={`font-medium truncate ${
-                match.participant2 
-                  ? p2IsWinner ? 'text-green-700' : 'text-gray-900'
-                  : 'text-gray-400 italic'
-              }`}
-              title={match.participant2?.name || 'TBD'}
-            >
-              {match.participant2?.name || 'TBD'}
-            </span>
-          </div>
-          <div className="flex items-center space-x-1 flex-shrink-0">
-            <input
-              type="number"
-              min="0"
-              value={match.participant2Score || ''}
-              onChange={(e) => handleScoreChange('participant2', e.target.value)}
-              className="w-14 text-center bg-white border border-gray-300 rounded-md 
-                       text-gray-900 text-sm py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                       disabled:opacity-40 disabled:cursor-not-allowed disabled:bg-gray-100"
-              disabled={!match.participant2}
-              placeholder="0"
-            />
-            <span className="text-xs text-gray-500 w-8">{scoreLabel.slice(0, 3)}</span>
-          </div>
-        </div>
+        {/* Participant 2 or Bye Indicator */}
+        {isByeMatch && !match.participant2 ? (
+          <ByeSlot isAutoAdvanced={!!isByeComplete} />
+        ) : (
+          <ParticipantRow
+            participant={match.participant2}
+            score={p2Score}
+            isWinner={p2IsWinner}
+            isDisabled={!match.participant2 || !hasBothParticipants}
+            scoreLabel={scoreLabel}
+            onScoreChange={(score) => handleScoreChange('participant2', score)}
+            isWildCard={!!match.wildCardParticipant2}
+          />
+        )}
 
-        {/* Status/Result */}
-        {statusMessage && (
-          <div className={`text-center py-1.5 px-2 rounded-md ${
-            match.winner 
-              ? 'bg-green-50 border border-green-300' 
-              : 'bg-orange-50 border border-orange-300'
-          }`}>
-            <span className={`text-xs font-medium ${match.winner ? 'text-green-700' : 'text-orange-700'}`}>
-              {statusMessage}
+        {/* Match Status */}
+        {isComplete && match.winner && (
+          <motion.div
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-3 py-2 px-3 bg-apple-green/10 rounded-apple text-center"
+          >
+            <span className="text-sm font-medium text-apple-green">
+              {match.winner.name} advances
             </span>
+          </motion.div>
+        )}
+
+        {/* Scoring Hint */}
+        {scoringHint && !isComplete && hasBothParticipants && p1Score === 0 && p2Score === 0 && (
+          <div className="mt-3 text-center">
+            <span className="text-xs text-apple-gray-400">{scoringHint}</span>
           </div>
         )}
 
-        {/* Scoring Help */}
-        {scoringHelp && !isComplete && (p1Score === 0 && p2Score === 0) && (
-          <div className="text-center">
-            <span className="text-xs text-gray-500">{scoringHelp}</span>
+        {/* Tied State */}
+        {hasBothParticipants && !isComplete && p1Score === p2Score && p1Score > 0 && (
+          <div className="mt-3 py-2 px-3 bg-apple-orange/10 rounded-apple text-center">
+            <span className="text-sm font-medium text-apple-orange">
+              Tied – Continue playing
+            </span>
           </div>
         )}
       </div>
-    </motion.div>
+    </div>
+  );
+});
+
+// Bye Slot Component - shows when a player has no opponent
+const ByeSlot = memo(function ByeSlot({ isAutoAdvanced }: { isAutoAdvanced: boolean }) {
+  return (
+    <div className="participant-row bg-purple-50/50 border border-purple-200/50 opacity-60">
+      <div className="flex items-center gap-3 flex-1 min-w-0">
+        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">
+          <svg className="w-4 h-4 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M18 12H6" />
+          </svg>
+        </div>
+        
+        <div className="flex-1 min-w-0">
+          <span className="font-medium text-purple-500 italic">
+            No opponent
+          </span>
+          <span className="text-xs text-purple-400 block">
+            {isAutoAdvanced ? 'Bye – Auto-advanced' : 'Bye – Pending'}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+});
+
+// Participant Row Component
+interface ParticipantRowProps {
+  participant: { id: string; name: string } | null | undefined;
+  score: number;
+  isWinner: boolean;
+  isDisabled: boolean;
+  scoreLabel: string;
+  onScoreChange: (score: string) => void;
+  isWildCard?: boolean;
+}
+
+const ParticipantRow = memo(function ParticipantRow({
+  participant,
+  score,
+  isWinner,
+  isDisabled,
+  scoreLabel,
+  onScoreChange,
+  isWildCard = false
+}: ParticipantRowProps) {
+  return (
+    <div className={`participant-row ${isWinner ? 'participant-row-winner' : participant ? '' : 'opacity-50'}`}>
+      <div className="flex items-center gap-3 flex-1 min-w-0">
+        {/* Winner Icon */}
+        {isWinner && (
+          <div className="flex-shrink-0 w-6 h-6 rounded-full bg-apple-green flex items-center justify-center">
+            <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+        )}
+        
+        {/* Avatar */}
+        {!isWinner && participant && (
+          <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center
+                          ${isWildCard ? 'bg-purple-500 text-white' : 'bg-apple-gray-200'}`}>
+            {isWildCard ? (
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            ) : (
+              <span className="text-sm font-semibold text-apple-gray-600">
+                {participant.name.charAt(0).toUpperCase()}
+              </span>
+            )}
+          </div>
+        )}
+        
+        {/* Name */}
+        <div className="flex-1 min-w-0">
+          <span 
+            className={`font-medium truncate block ${
+              isWinner 
+                ? 'text-apple-green' 
+                : participant 
+                ? 'text-apple-gray-900'
+                : 'text-apple-gray-400 italic'
+            }`}
+            title={participant?.name || 'TBD'}
+          >
+            {participant?.name || 'Awaiting opponent'}
+          </span>
+          {isWildCard && !isWinner && (
+            <span className="text-xs text-purple-500">Wild Card</span>
+          )}
+        </div>
+      </div>
+
+      {/* Score Input */}
+      <div className="flex items-center gap-2 flex-shrink-0">
+        <input
+          type="number"
+          inputMode="numeric"
+          pattern="[0-9]*"
+          min="0"
+          value={score || ''}
+          onChange={(e) => onScoreChange(e.target.value)}
+          className={`score-input ${isWinner ? 'bg-apple-green/10 border-apple-green/30' : ''}`}
+          disabled={isDisabled}
+          placeholder="0"
+        />
+        <span className="text-xs text-apple-gray-400 w-6 truncate" title={scoreLabel}>
+          {scoreLabel.slice(0, 4)}
+        </span>
+      </div>
+    </div>
   );
 });

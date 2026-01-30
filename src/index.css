@@ -2,90 +2,470 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Apple-style Design System */
 @layer base {
+  :root {
+    /* Colors */
+    --color-bg-primary: #FFFFFF;
+    --color-bg-secondary: #F5F5F7;
+    --color-bg-tertiary: #FAFAFA;
+    --color-text-primary: #1D1D1F;
+    --color-text-secondary: #6E6E73;
+    --color-text-tertiary: #86868B;
+    --color-border: rgba(0, 0, 0, 0.06);
+    --color-border-strong: rgba(0, 0, 0, 0.1);
+    --color-accent: #0071E3;
+    --color-accent-hover: #0077ED;
+    --color-success: #34C759;
+    --color-warning: #FF9500;
+    --color-error: #FF3B30;
+    
+    /* Spacing */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    --radius-2xl: 24px;
+    
+    /* Transitions */
+    --transition-fast: 150ms ease;
+    --transition-base: 250ms ease;
+    --transition-slow: 400ms ease;
+    --timing-apple: cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+
+  html {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text',
+                 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
   body {
-    @apply antialiased;
+    @apply bg-apple-gray-100 text-apple-gray-900;
+    font-feature-settings: 'kern' 1;
+  }
+
+  /* Selection styling */
+  ::selection {
+    background: rgba(0, 113, 227, 0.2);
   }
 }
 
 @layer components {
-  .bracket-line {
-    @apply border-2 border-gray-700 rounded transition-all duration-300;
-  }
-  
-  .bracket-node {
-    @apply bg-white shadow-lg rounded-xl p-4 mb-4 transition-all duration-300 hover:shadow-xl border border-gray-100;
-  }
-
-  .bracket-input {
-    @apply w-full px-3 py-2 border border-gray-300 rounded-lg 
-           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-           transition-all duration-200 placeholder-gray-400;
-  }
-
-  .btn {
-    @apply px-4 py-2 rounded-lg font-semibold text-white transition-all duration-200
-           focus:outline-none focus:ring-2 focus:ring-offset-2
-           disabled:opacity-50 disabled:cursor-not-allowed;
-  }
-
-  .btn-primary {
-    @apply btn bg-blue-600 hover:bg-blue-700 focus:ring-blue-500
-           active:transform active:scale-95;
-  }
-
-  .btn-secondary {
-    @apply btn bg-gray-600 hover:bg-gray-700 focus:ring-gray-500;
-  }
-
-  .btn-danger {
-    @apply btn bg-red-600 hover:bg-red-700 focus:ring-red-500;
-  }
-
-  .btn-outline {
-    @apply px-4 py-2 rounded-lg font-medium border-2 transition-all duration-200
-           focus:outline-none focus:ring-2 focus:ring-offset-2;
-  }
-
-  .btn-outline-primary {
-    @apply btn-outline border-blue-600 text-blue-600 
-           hover:bg-blue-50 focus:ring-blue-500;
-  }
-
+  /* Card System - Apple style */
   .card {
-    @apply bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden;
+    @apply bg-white rounded-apple-xl border border-apple-gray-200/50;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.04);
+    transition: box-shadow var(--transition-base) var(--timing-apple),
+                transform var(--transition-base) var(--timing-apple);
+  }
+
+  .card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.06);
+  }
+
+  .card-elevated {
+    @apply card;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 12px 32px rgba(0, 0, 0, 0.08);
   }
 
   .card-header {
-    @apply px-4 py-3 border-b border-gray-100 bg-gray-50/50;
+    @apply px-6 py-4 border-b border-apple-gray-200/50;
   }
 
   .card-body {
-    @apply p-4;
+    @apply p-6;
   }
 
-  /* Status badges */
+  /* Glass morphism card */
+  .card-glass {
+    @apply rounded-apple-xl border border-white/20;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  }
+
+  /* Input styling - Apple native feel */
+  .input {
+    @apply w-full px-4 py-3 text-base text-apple-gray-900 
+           bg-white border border-apple-gray-300
+           rounded-apple transition-all duration-200
+           placeholder:text-apple-gray-400;
+    outline: none;
+  }
+
+  .input:hover {
+    @apply border-apple-gray-400;
+  }
+
+  .input:focus {
+    @apply border-apple-blue ring-4 ring-apple-blue/10;
+  }
+
+  .input:disabled {
+    @apply bg-apple-gray-100 text-apple-gray-400 cursor-not-allowed;
+  }
+
+  .input-error {
+    @apply input border-apple-red ring-4 ring-apple-red/10;
+  }
+
+  /* Select styling */
+  .select {
+    @apply input appearance-none cursor-pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%2386868B' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+    background-position: right 12px center;
+    background-repeat: no-repeat;
+    background-size: 20px;
+    padding-right: 44px;
+  }
+
+  /* Button System */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 
+           px-5 py-3 font-semibold text-base
+           rounded-apple-lg transition-all duration-200
+           focus:outline-none focus:ring-4
+           disabled:opacity-50 disabled:cursor-not-allowed
+           active:scale-[0.98];
+  }
+
+  .btn-primary {
+    @apply btn text-white bg-apple-blue hover:bg-apple-blue-dark
+           focus:ring-apple-blue/30;
+  }
+
+  .btn-secondary {
+    @apply btn text-apple-gray-700 bg-apple-gray-200 
+           hover:bg-apple-gray-300 focus:ring-apple-gray-400/30;
+  }
+
+  .btn-ghost {
+    @apply btn text-apple-blue bg-transparent
+           hover:bg-apple-blue/10 focus:ring-apple-blue/20;
+  }
+
+  .btn-danger {
+    @apply btn text-white bg-apple-red hover:bg-apple-red-light
+           focus:ring-apple-red/30;
+  }
+
+  .btn-success {
+    @apply btn text-white bg-apple-green hover:bg-apple-green-light
+           focus:ring-apple-green/30;
+  }
+
+  .btn-sm {
+    @apply px-4 py-2 text-sm rounded-apple;
+  }
+
+  .btn-lg {
+    @apply px-8 py-4 text-lg;
+  }
+
+  .btn-icon {
+    @apply p-3 aspect-square;
+  }
+
+  /* Badge System */
   .badge {
-    @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium;
+    @apply inline-flex items-center gap-1 px-2.5 py-1 
+           text-xs font-semibold rounded-full;
   }
 
-  .badge-success {
-    @apply badge bg-green-100 text-green-800;
+  .badge-blue {
+    @apply badge bg-apple-blue/10 text-apple-blue;
   }
 
-  .badge-warning {
-    @apply badge bg-yellow-100 text-yellow-800;
+  .badge-green {
+    @apply badge bg-apple-green/10 text-apple-green;
   }
 
-  .badge-danger {
-    @apply badge bg-red-100 text-red-800;
+  .badge-red {
+    @apply badge bg-apple-red/10 text-apple-red;
   }
 
-  .badge-info {
-    @apply badge bg-blue-100 text-blue-800;
+  .badge-orange {
+    @apply badge bg-apple-orange/10 text-apple-orange;
   }
 
   .badge-gray {
-    @apply badge bg-gray-100 text-gray-700;
+    @apply badge bg-apple-gray-200 text-apple-gray-600;
+  }
+
+  .badge-yellow {
+    @apply badge bg-apple-yellow/20 text-amber-700;
+  }
+
+  /* Section Headers */
+  .section-title {
+    @apply text-2xl font-bold text-apple-gray-900 tracking-tight;
+  }
+
+  .section-subtitle {
+    @apply text-apple-gray-500 mt-1;
+  }
+
+  /* Dividers */
+  .divider {
+    @apply h-px bg-apple-gray-200;
+  }
+
+  /* Match Card styling */
+  .match-card {
+    @apply bg-white rounded-apple-lg border border-apple-gray-200/70
+           transition-all duration-300;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  }
+
+  .match-card:hover {
+    @apply border-apple-gray-300;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transform: translateY(-1px);
+  }
+
+  .match-card-active {
+    @apply match-card ring-2 ring-apple-blue/30 border-apple-blue;
+  }
+
+  .match-card-complete {
+    @apply match-card border-apple-green/50;
+  }
+
+  .match-card-final {
+    @apply match-card ring-2 ring-apple-yellow/50 border-apple-yellow;
+    background: linear-gradient(to bottom, #FFFBEB, #FFFFFF);
+  }
+
+  .match-card-wildcard {
+    @apply match-card ring-2 ring-purple-300/50 border-purple-300;
+    background: linear-gradient(to bottom, #FAF5FF, #FFFFFF);
+  }
+
+  /* Participant Row */
+  .participant-row {
+    @apply flex items-center justify-between p-3 rounded-apple
+           transition-all duration-200 border border-transparent;
+  }
+
+  .participant-row:hover {
+    @apply bg-apple-gray-50;
+  }
+
+  .participant-row-winner {
+    @apply bg-apple-green/5 border-apple-green/30;
+  }
+
+  .participant-row-active {
+    @apply bg-apple-gray-50 border-apple-gray-200;
+  }
+
+  /* Score Input */
+  .score-input {
+    @apply w-16 text-center bg-apple-gray-50 border border-apple-gray-200
+           rounded-apple py-2 text-base font-semibold text-apple-gray-900
+           transition-all duration-200;
+    outline: none;
+  }
+
+  .score-input:hover {
+    @apply border-apple-gray-300 bg-white;
+  }
+
+  .score-input:focus {
+    @apply border-apple-blue bg-white ring-4 ring-apple-blue/10;
+  }
+
+  .score-input:disabled {
+    @apply bg-apple-gray-100 text-apple-gray-400 cursor-not-allowed;
+  }
+
+  /* Progress Bar */
+  .progress-track {
+    @apply h-1.5 bg-apple-gray-200 rounded-full overflow-hidden;
+  }
+
+  .progress-fill {
+    @apply h-full bg-apple-blue rounded-full transition-all duration-500;
+  }
+
+  /* Bracket Lines */
+  .bracket-connector {
+    stroke: #D2D2D7;
+    stroke-width: 2;
+    fill: none;
+    transition: stroke 0.2s ease;
+  }
+
+  .bracket-connector:hover {
+    stroke: #86868B;
+  }
+
+  .bracket-connector-active {
+    stroke: #0071E3;
+    stroke-width: 2.5;
+  }
+
+  /* Scrollbar styling - Apple style */
+  .scrollbar-apple {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+  }
+
+  .scrollbar-apple::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .scrollbar-apple::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-apple::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 100px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+
+  .scrollbar-apple::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.25);
+    background-clip: content-box;
+  }
+
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hidden {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hidden::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Bracket scroll container */
+  .bracket-scroll {
+    @apply overflow-x-auto overflow-y-visible scrollbar-apple;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Mobile-optimized touch targets */
+  @media (max-width: 768px) {
+    .btn {
+      @apply min-h-[48px] text-base;
+    }
+    
+    .input, .select {
+      @apply min-h-[48px] text-base;
+    }
+    
+    .score-input {
+      @apply w-20 min-h-[44px] text-lg;
+    }
+    
+    .participant-row {
+      @apply py-4;
+    }
+    
+    .card-header {
+      @apply px-4 py-3;
+    }
+    
+    .card-body {
+      @apply p-4;
+    }
+  }
+
+  /* iPad optimizations */
+  @media (min-width: 768px) and (max-width: 1024px) {
+    .bracket-scroll {
+      @apply pb-6;
+    }
+  }
+}
+
+@layer utilities {
+  /* Text utilities */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Animation utilities */
+  .animate-in {
+    animation: fadeUp 0.5s ease-out forwards;
+  }
+
+  .animate-in-delay-1 {
+    animation: fadeUp 0.5s ease-out 0.1s forwards;
+    opacity: 0;
+  }
+
+  .animate-in-delay-2 {
+    animation: fadeUp 0.5s ease-out 0.2s forwards;
+    opacity: 0;
+  }
+
+  .animate-in-delay-3 {
+    animation: fadeUp 0.5s ease-out 0.3s forwards;
+    opacity: 0;
+  }
+
+  /* Stagger animation for lists */
+  .stagger-children > * {
+    opacity: 0;
+    animation: fadeUp 0.4s ease-out forwards;
+  }
+
+  .stagger-children > *:nth-child(1) { animation-delay: 0.05s; }
+  .stagger-children > *:nth-child(2) { animation-delay: 0.1s; }
+  .stagger-children > *:nth-child(3) { animation-delay: 0.15s; }
+  .stagger-children > *:nth-child(4) { animation-delay: 0.2s; }
+  .stagger-children > *:nth-child(5) { animation-delay: 0.25s; }
+  .stagger-children > *:nth-child(6) { animation-delay: 0.3s; }
+  .stagger-children > *:nth-child(7) { animation-delay: 0.35s; }
+  .stagger-children > *:nth-child(8) { animation-delay: 0.4s; }
+
+  /* Loading spinner */
+  .spinner {
+    @apply w-5 h-5 border-2 border-current border-t-transparent rounded-full;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes fadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Trophy animation */
+  .trophy-float {
+    animation: trophyFloat 3s ease-in-out infinite;
+  }
+
+  @keyframes trophyFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  /* Pulse for winner highlight */
+  .winner-glow {
+    animation: winnerGlow 2s ease-in-out infinite;
+  }
+
+  @keyframes winnerGlow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(52, 199, 89, 0.4); }
+    50% { box-shadow: 0 0 0 8px rgba(52, 199, 89, 0); }
   }
 }

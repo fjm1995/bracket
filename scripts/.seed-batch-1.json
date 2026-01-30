@@ -1,0 +1,4486 @@
+{
+  "BracketTournaments": [
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "b02cfd60-2878-4a38-8e95-3d41f0942148"
+          },
+          "name": {
+            "S": "NBA 2K Test 1 #8908"
+          },
+          "game": {
+            "S": "NBA 2K"
+          },
+          "scoringMode": {
+            "S": "higher_score"
+          },
+          "scoreLabel": {
+            "S": "Points"
+          },
+          "seedingMode": {
+            "S": "random"
+          },
+          "isStarted": {
+            "BOOL": false
+          },
+          "participants": {
+            "L": [
+              {
+                "M": {
+                  "id": {
+                    "S": "52044f2c-03b5-4ff0-94d1-077c80cb41a9"
+                  },
+                  "name": {
+                    "S": "Riley Lee 3"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "8ab7509e-2c39-4461-a67d-fe4232cd5350"
+                  },
+                  "name": {
+                    "S": "Parker Moore 90"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "cb1db12a-9cb0-4ead-a912-20fcead3087d"
+                  },
+                  "name": {
+                    "S": "Jordan Williams 42"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "ae2418e4-24fc-4445-a874-c00478924ad4"
+                  },
+                  "name": {
+                    "S": "Jordan Davis 9"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "4441e034-6f14-4b92-b717-b29775f6f9d9"
+                  },
+                  "name": {
+                    "S": "Parker Smith 88"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "669ade38-2027-4c38-ba0a-e9e188603471"
+                  },
+                  "name": {
+                    "S": "Rowan Thomas 12"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "7a5e535e-09bf-41ef-a6a1-fd50f5954455"
+                  },
+                  "name": {
+                    "S": "Rowan Williams 65"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "da693126-7766-4623-b695-48549c2c817f"
+                  },
+                  "name": {
+                    "S": "Reese Anderson 71"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "9a911997-92c4-4852-b46e-59618b28eed5"
+                  },
+                  "name": {
+                    "S": "Alex Williams 35"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "357509f7-0abe-41a4-b736-f68ee19c792d"
+                  },
+                  "name": {
+                    "S": "Quinn Wilson 44"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              }
+            ]
+          },
+          "matches": {
+            "L": []
+          },
+          "currentRound": {
+            "N": "1"
+          },
+          "totalRounds": {
+            "N": "0"
+          },
+          "finalizedRounds": {
+            "L": []
+          },
+          "createdAt": {
+            "N": "1769787050665"
+          },
+          "updatedAt": {
+            "N": "1769787050665"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "d15347b4-b810-44ee-b4a8-08be7b06c1b6"
+          },
+          "name": {
+            "S": "Madden NFL Test 1 #9734"
+          },
+          "game": {
+            "S": "Madden NFL"
+          },
+          "scoringMode": {
+            "S": "higher_score"
+          },
+          "scoreLabel": {
+            "S": "Points"
+          },
+          "seedingMode": {
+            "S": "random"
+          },
+          "isStarted": {
+            "BOOL": false
+          },
+          "participants": {
+            "L": [
+              {
+                "M": {
+                  "id": {
+                    "S": "bf8a3c5b-ad73-44a5-8b60-9b4944ff64ab"
+                  },
+                  "name": {
+                    "S": "Reese White 34"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "215043af-5ab8-4fed-90d9-75e7076b8e43"
+                  },
+                  "name": {
+                    "S": "Morgan Brown 47"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "10493892-b8f5-42c5-b5c0-7e3a8e23b1ca"
+                  },
+                  "name": {
+                    "S": "Quinn Brown 96"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "8852353b-e7b9-47bd-8071-1388e71a9547"
+                  },
+                  "name": {
+                    "S": "Parker Lee 98"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "a308249e-57ff-4914-b770-d82b076802da"
+                  },
+                  "name": {
+                    "S": "Emerson Smith 44"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "3afd462a-a865-4408-8049-6ef03dcf05d6"
+                  },
+                  "name": {
+                    "S": "Jordan Johnson 55"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "a8ca8a26-fe58-4213-b765-7737653e1d3b"
+                  },
+                  "name": {
+                    "S": "Jordan White 29"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "0a9f7578-6cd0-4fe7-a5e7-898d67bc1292"
+                  },
+                  "name": {
+                    "S": "Cameron Wilson 25"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "0d00d533-d813-4743-81d2-89a3027141c5"
+                  },
+                  "name": {
+                    "S": "Parker Williams 82"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "c5fa9e17-c302-41fd-a102-b4d0a7a3577d"
+                  },
+                  "name": {
+                    "S": "Casey Brown 38"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "6a5d24d7-9b5d-428c-bab1-ae18dc51b3ca"
+                  },
+                  "name": {
+                    "S": "Avery Smith 60"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              }
+            ]
+          },
+          "matches": {
+            "L": []
+          },
+          "currentRound": {
+            "N": "1"
+          },
+          "totalRounds": {
+            "N": "0"
+          },
+          "finalizedRounds": {
+            "L": []
+          },
+          "createdAt": {
+            "N": "1769787050665"
+          },
+          "updatedAt": {
+            "N": "1769787050665"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "459fa826-bb32-4040-9e22-3b66984ddf68"
+          },
+          "name": {
+            "S": "EA FC (FIFA) Test 1 #6958"
+          },
+          "game": {
+            "S": "EA FC (FIFA)"
+          },
+          "scoringMode": {
+            "S": "higher_score"
+          },
+          "scoreLabel": {
+            "S": "Goals"
+          },
+          "seedingMode": {
+            "S": "random"
+          },
+          "isStarted": {
+            "BOOL": false
+          },
+          "participants": {
+            "L": [
+              {
+                "M": {
+                  "id": {
+                    "S": "c869d810-9345-4a11-aa54-ddd06bbfd483"
+                  },
+                  "name": {
+                    "S": "Alex Wilson 88"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "7bc877bc-ebde-452d-8694-628993501aac"
+                  },
+                  "name": {
+                    "S": "Drew Wilson 22"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "2727cd1b-6cae-427f-be83-e02ca4f9e62e"
+                  },
+                  "name": {
+                    "S": "Reese Thomas 45"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "3707af16-5366-4c2b-bf3e-0fce69ae79af"
+                  },
+                  "name": {
+                    "S": "Finley Johnson 73"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "bef828d0-f592-4cb5-9176-cd143d71531a"
+                  },
+                  "name": {
+                    "S": "Alex Smith 48"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "04a37e68-9ad9-4110-9285-9c6c71baf14b"
+                  },
+                  "name": {
+                    "S": "Alex Taylor 87"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "bf593a87-0aaf-4b3b-95d9-8e7f02d9c617"
+                  },
+                  "name": {
+                    "S": "Parker Williams 69"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              }
+            ]
+          },
+          "matches": {
+            "L": []
+          },
+          "currentRound": {
+            "N": "1"
+          },
+          "totalRounds": {
+            "N": "0"
+          },
+          "finalizedRounds": {
+            "L": []
+          },
+          "createdAt": {
+            "N": "1769787050665"
+          },
+          "updatedAt": {
+            "N": "1769787050665"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "655d8544-4bce-4509-aa19-dd789f554f91"
+          },
+          "name": {
+            "S": "Rocket League Test 1 #5428"
+          },
+          "game": {
+            "S": "Rocket League"
+          },
+          "scoringMode": {
+            "S": "higher_score"
+          },
+          "scoreLabel": {
+            "S": "Goals"
+          },
+          "seedingMode": {
+            "S": "random"
+          },
+          "isStarted": {
+            "BOOL": false
+          },
+          "participants": {
+            "L": [
+              {
+                "M": {
+                  "id": {
+                    "S": "22ed4c49-6e4f-4524-a0b3-0d52df87f5ad"
+                  },
+                  "name": {
+                    "S": "Avery Wilson 54"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "5db9c756-31ba-4183-8887-18467b6cfb8a"
+                  },
+                  "name": {
+                    "S": "Cameron Moore 68"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "308e3296-6052-4515-b005-f7feee2678d5"
+                  },
+                  "name": {
+                    "S": "Quinn Smith 60"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "6f6d62cd-eb33-4f17-91b1-b3504eefde02"
+                  },
+                  "name": {
+                    "S": "Emerson Anderson 89"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "35e89a22-b371-4659-9ea0-bf382e0f0400"
+                  },
+                  "name": {
+                    "S": "Rowan White 30"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "9d425f2b-3708-4203-a9e5-f9ac0adc0ec7"
+                  },
+                  "name": {
+                    "S": "Reese Martin 61"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "568418b7-eff1-4dad-835a-acefeeb8e3b7"
+                  },
+                  "name": {
+                    "S": "Reese Smith 35"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "d06d0ae4-c1e7-42cf-98a6-5396f2ef5783"
+                  },
+                  "name": {
+                    "S": "Parker Anderson 2"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "e0209361-b296-4757-841c-ffe7c9843969"
+                  },
+                  "name": {
+                    "S": "Hayden Anderson 4"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "dc7106fb-534c-4acc-9207-28a1a8d05363"
+                  },
+                  "name": {
+                    "S": "Jordan Harris 8"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "9eb8975f-edfa-4190-83ed-cc846999635d"
+                  },
+                  "name": {
+                    "S": "Riley Jackson 61"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "632753b8-b24b-48a2-b486-e27f65e3cfe8"
+                  },
+                  "name": {
+                    "S": "Avery Wilson 45"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              }
+            ]
+          },
+          "matches": {
+            "L": []
+          },
+          "currentRound": {
+            "N": "1"
+          },
+          "totalRounds": {
+            "N": "0"
+          },
+          "finalizedRounds": {
+            "L": []
+          },
+          "createdAt": {
+            "N": "1769787050665"
+          },
+          "updatedAt": {
+            "N": "1769787050665"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "87c1213c-e006-45dc-8a08-b1754882d6cc"
+          },
+          "name": {
+            "S": "MLB The Show Test 1 #7909"
+          },
+          "game": {
+            "S": "MLB The Show"
+          },
+          "scoringMode": {
+            "S": "higher_score"
+          },
+          "scoreLabel": {
+            "S": "Runs"
+          },
+          "seedingMode": {
+            "S": "random"
+          },
+          "isStarted": {
+            "BOOL": false
+          },
+          "participants": {
+            "L": [
+              {
+                "M": {
+                  "id": {
+                    "S": "8c2096ae-7232-4265-98cc-5fe3aa3fb33b"
+                  },
+                  "name": {
+                    "S": "Alex Martin 28"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "cc79a6d7-967e-43e7-b69b-68dc9c011381"
+                  },
+                  "name": {
+                    "S": "Hayden Miller 9"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "c81ed33e-637a-4b3c-bf7e-0580e6447e83"
+                  },
+                  "name": {
+                    "S": "Morgan Williams 15"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "a852e3ed-2c38-48f8-8ab3-efd242223452"
+                  },
+                  "name": {
+                    "S": "Casey White 80"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "7611d93d-a845-48e2-b54b-e9b58ea7b3db"
+                  },
+                  "name": {
+                    "S": "Taylor White 47"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "70a2f3d7-cf46-408e-a22b-15417d015a2b"
+                  },
+                  "name": {
+                    "S": "Finley White 55"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "cff34290-13f5-41c0-97f7-fb89da7da0ac"
+                  },
+                  "name": {
+                    "S": "Alex Johnson 22"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "ef424ef6-66d6-4d09-8ccf-bd3dcf4f706d"
+                  },
+                  "name": {
+                    "S": "Reese Johnson 9"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "b9ad92e7-b87b-470e-9340-c783d3737efc"
+                  },
+                  "name": {
+                    "S": "Drew Brown 50"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "b4102034-6ff4-4a68-b534-98d881204d86"
+                  },
+                  "name": {
+                    "S": "Casey Davis 97"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "e6879e71-ff5e-4131-918a-29ff1b5b3990"
+                  },
+                  "name": {
+                    "S": "Rowan Williams 16"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              }
+            ]
+          },
+          "matches": {
+            "L": []
+          },
+          "currentRound": {
+            "N": "1"
+          },
+          "totalRounds": {
+            "N": "0"
+          },
+          "finalizedRounds": {
+            "L": []
+          },
+          "createdAt": {
+            "N": "1769787050665"
+          },
+          "updatedAt": {
+            "N": "1769787050665"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "10a44b6b-9a4c-46ca-919a-95c7dc6da55b"
+          },
+          "name": {
+            "S": "NHL Test 1 #4009"
+          },
+          "game": {
+            "S": "NHL"
+          },
+          "scoringMode": {
+            "S": "higher_score"
+          },
+          "scoreLabel": {
+            "S": "Goals"
+          },
+          "seedingMode": {
+            "S": "random"
+          },
+          "isStarted": {
+            "BOOL": false
+          },
+          "participants": {
+            "L": [
+              {
+                "M": {
+                  "id": {
+                    "S": "f718c299-0e30-4652-915e-55045b89c992"
+                  },
+                  "name": {
+                    "S": "Finley Williams 7"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "6ffb5f2a-608c-4de0-8400-b417c870cdc5"
+                  },
+                  "name": {
+                    "S": "Jordan Wilson 31"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "9b85cc96-4407-4dea-bc60-cd118437a07c"
+                  },
+                  "name": {
+                    "S": "Drew White 14"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "1b7f247c-fb38-4c3b-915e-f8c4b710006c"
+                  },
+                  "name": {
+                    "S": "Avery Martin 16"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "aac4c105-c20d-4b5f-b43a-70a9001f7c8d"
+                  },
+                  "name": {
+                    "S": "Jordan Harris 99"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "e39d836c-c75d-4e5e-a0b9-d335c529d7fb"
+                  },
+                  "name": {
+                    "S": "Drew Lee 78"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              }
+            ]
+          },
+          "matches": {
+            "L": []
+          },
+          "currentRound": {
+            "N": "1"
+          },
+          "totalRounds": {
+            "N": "0"
+          },
+          "finalizedRounds": {
+            "L": []
+          },
+          "createdAt": {
+            "N": "1769787050665"
+          },
+          "updatedAt": {
+            "N": "1769787050665"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "055c8812-aeae-43be-951f-a8e00850cd40"
+          },
+          "name": {
+            "S": "Fortnite (Box Fights) Test 1 #9778"
+          },
+          "game": {
+            "S": "Fortnite (Box Fights)"
+          },
+          "scoringMode": {
+            "S": "best_of"
+          },
+          "scoreLabel": {
+            "S": "Round Wins"
+          },
+          "targetScore": {
+            "N": "3"
+          },
+          "seedingMode": {
+            "S": "random"
+          },
+          "isStarted": {
+            "BOOL": false
+          },
+          "participants": {
+            "L": [
+              {
+                "M": {
+                  "id": {
+                    "S": "6e1958bb-e5e9-4de9-87f9-f8e1db0a95f5"
+                  },
+                  "name": {
+                    "S": "Alex Taylor 75"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "d20ca786-0b29-4194-9aa6-b5d55dc0af5f"
+                  },
+                  "name": {
+                    "S": "Riley Harris 31"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "fcd7598f-3264-43d6-af03-9cff7dfb2fee"
+                  },
+                  "name": {
+                    "S": "Jordan Martin 91"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "2d822282-ca05-4fcf-bfa3-7ec9c473f140"
+                  },
+                  "name": {
+                    "S": "Cameron Williams 45"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "9afff3aa-d5b1-4d91-bbd1-38b8f3e1d57f"
+                  },
+                  "name": {
+                    "S": "Reese Johnson 49"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "ebcc3508-9267-418c-aa3a-8f63401ebe73"
+                  },
+                  "name": {
+                    "S": "Parker Thomas 63"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "6f458ae9-956a-46a1-9c3a-8b3f6d87bb0e"
+                  },
+                  "name": {
+                    "S": "Finley Miller 25"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "fcf6fb7d-aeb7-4533-aa06-ea691466ad6e"
+                  },
+                  "name": {
+                    "S": "Casey Williams 61"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "ff4e0d1b-9245-4687-a3fe-a36fd6bacad2"
+                  },
+                  "name": {
+                    "S": "Casey Miller 67"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "da0a87a2-cf1f-499d-b9cb-a042d3a68c9b"
+                  },
+                  "name": {
+                    "S": "Avery Williams 14"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "ef1664ff-850b-4c2b-8a48-d891c36c9cf9"
+                  },
+                  "name": {
+                    "S": "Emerson Thomas 16"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              }
+            ]
+          },
+          "matches": {
+            "L": []
+          },
+          "currentRound": {
+            "N": "1"
+          },
+          "totalRounds": {
+            "N": "0"
+          },
+          "finalizedRounds": {
+            "L": []
+          },
+          "createdAt": {
+            "N": "1769787050665"
+          },
+          "updatedAt": {
+            "N": "1769787050665"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "e293fa06-d6f7-42c2-a77a-67906a57de40"
+          },
+          "name": {
+            "S": "Fortnite (Kill Race) Test 1 #7269"
+          },
+          "game": {
+            "S": "Fortnite (Kill Race)"
+          },
+          "scoringMode": {
+            "S": "higher_score"
+          },
+          "scoreLabel": {
+            "S": "Kills"
+          },
+          "seedingMode": {
+            "S": "random"
+          },
+          "isStarted": {
+            "BOOL": false
+          },
+          "participants": {
+            "L": [
+              {
+                "M": {
+                  "id": {
+                    "S": "1ec62de1-2859-4994-ab74-5fcd665fb5d8"
+                  },
+                  "name": {
+                    "S": "Morgan Smith 35"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "88f12124-38b9-4fcb-9a70-da5ed8687046"
+                  },
+                  "name": {
+                    "S": "Rowan Brown 94"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "276ba978-6f9f-49cc-a527-b86db3acfe2d"
+                  },
+                  "name": {
+                    "S": "Alex Taylor 82"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "e3f33865-74d0-4b99-8b3f-314134121b63"
+                  },
+                  "name": {
+                    "S": "Parker Harris 80"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "657eb34f-19f8-4037-9eef-7f4a10e3ded8"
+                  },
+                  "name": {
+                    "S": "Jordan Miller 83"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "db035262-79f9-4593-87af-ac95143d2412"
+                  },
+                  "name": {
+                    "S": "Emerson Harris 42"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "0518353c-ef43-492e-ab50-ad1dd698544e"
+                  },
+                  "name": {
+                    "S": "Finley Smith 36"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "5311e95f-c4b2-4b4c-9f8a-f43ecff58aec"
+                  },
+                  "name": {
+                    "S": "Reese Smith 86"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "3c64f529-b9a5-40e3-8b9a-f594d35b4a04"
+                  },
+                  "name": {
+                    "S": "Jordan Lee 16"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "f7b67fb0-1ff7-487c-a404-036399084248"
+                  },
+                  "name": {
+                    "S": "Morgan Smith 50"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "6724f81b-880f-44aa-8cd6-cff1357e7bcd"
+                  },
+                  "name": {
+                    "S": "Parker Brown 26"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "23747a70-aafd-49ec-8345-7668257add14"
+                  },
+                  "name": {
+                    "S": "Avery Taylor 24"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              }
+            ]
+          },
+          "matches": {
+            "L": []
+          },
+          "currentRound": {
+            "N": "1"
+          },
+          "totalRounds": {
+            "N": "0"
+          },
+          "finalizedRounds": {
+            "L": []
+          },
+          "createdAt": {
+            "N": "1769787050665"
+          },
+          "updatedAt": {
+            "N": "1769787050665"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "7b002143-78a9-4ef9-a004-a34be788ee25"
+          },
+          "name": {
+            "S": "Super Smash Bros Test 1 #8526"
+          },
+          "game": {
+            "S": "Super Smash Bros"
+          },
+          "scoringMode": {
+            "S": "best_of"
+          },
+          "scoreLabel": {
+            "S": "Match Wins"
+          },
+          "targetScore": {
+            "N": "3"
+          },
+          "seedingMode": {
+            "S": "random"
+          },
+          "isStarted": {
+            "BOOL": false
+          },
+          "participants": {
+            "L": [
+              {
+                "M": {
+                  "id": {
+                    "S": "93d5127b-8c72-4492-853a-3adb28ee3c1d"
+                  },
+                  "name": {
+                    "S": "Quinn Wilson 68"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "472f7edb-99f8-462f-a9bf-df0c2f55fcd6"
+                  },
+                  "name": {
+                    "S": "Avery Miller 80"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "0cde17df-3ce0-4a9b-84f7-d4d6fb6d48e6"
+                  },
+                  "name": {
+                    "S": "Reese Miller 50"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "6725fbd2-3705-4cff-954d-1aa3676c6f8b"
+                  },
+                  "name": {
+                    "S": "Alex Taylor 76"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "2fe7af66-1016-4009-9596-cf20728c700c"
+                  },
+                  "name": {
+                    "S": "Emerson Martin 15"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "97bd26a4-ea5e-4376-8d58-67c373dae9ab"
+                  },
+                  "name": {
+                    "S": "Morgan White 61"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "58153266-91a2-4021-bfd3-d0788d4b13a3"
+                  },
+                  "name": {
+                    "S": "Reese Johnson 91"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              }
+            ]
+          },
+          "matches": {
+            "L": []
+          },
+          "currentRound": {
+            "N": "1"
+          },
+          "totalRounds": {
+            "N": "0"
+          },
+          "finalizedRounds": {
+            "L": []
+          },
+          "createdAt": {
+            "N": "1769787050665"
+          },
+          "updatedAt": {
+            "N": "1769787050665"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "f647affd-a537-4740-9c7c-77c1a96b08de"
+          },
+          "name": {
+            "S": "Mortal Kombat Test 1 #7823"
+          },
+          "game": {
+            "S": "Mortal Kombat"
+          },
+          "scoringMode": {
+            "S": "best_of"
+          },
+          "scoreLabel": {
+            "S": "Round Wins"
+          },
+          "targetScore": {
+            "N": "2"
+          },
+          "seedingMode": {
+            "S": "random"
+          },
+          "isStarted": {
+            "BOOL": false
+          },
+          "participants": {
+            "L": [
+              {
+                "M": {
+                  "id": {
+                    "S": "e8518d36-47da-44fa-a9ee-b4a419a2fd40"
+                  },
+                  "name": {
+                    "S": "Rowan Brown 40"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "e02c383b-6d5a-420f-905d-23bc136352ed"
+                  },
+                  "name": {
+                    "S": "Quinn Taylor 90"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "086eb629-786b-4c53-9694-331421642d7e"
+                  },
+                  "name": {
+                    "S": "Reese Moore 45"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "6f517413-9bec-4c98-a0b8-9475d57d9d71"
+                  },
+                  "name": {
+                    "S": "Cameron Thomas 10"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "4bce4c25-d4bd-4bd9-997d-a7e89c276643"
+                  },
+                  "name": {
+                    "S": "Morgan Taylor 33"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "dfeb2092-13dd-4f07-b933-e21b480ef877"
+                  },
+                  "name": {
+                    "S": "Drew Anderson 64"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "b39f93d2-0097-432d-99f5-c0de8295c6d5"
+                  },
+                  "name": {
+                    "S": "Alex Thomas 7"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "75a40b0d-48f7-4b93-8818-36ffb469524c"
+                  },
+                  "name": {
+                    "S": "Riley Harris 2"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "adaf138f-67e2-4ffa-9abe-d9349a5387e5"
+                  },
+                  "name": {
+                    "S": "Avery Martin 11"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "a0983c0f-dae3-401c-a019-8101c8f96a43"
+                  },
+                  "name": {
+                    "S": "Morgan Smith 63"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              }
+            ]
+          },
+          "matches": {
+            "L": []
+          },
+          "currentRound": {
+            "N": "1"
+          },
+          "totalRounds": {
+            "N": "0"
+          },
+          "finalizedRounds": {
+            "L": []
+          },
+          "createdAt": {
+            "N": "1769787050665"
+          },
+          "updatedAt": {
+            "N": "1769787050665"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "d513f1b2-859e-4e9f-a4d0-8c0230191bc0"
+          },
+          "name": {
+            "S": "Street Fighter Test 1 #4390"
+          },
+          "game": {
+            "S": "Street Fighter"
+          },
+          "scoringMode": {
+            "S": "best_of"
+          },
+          "scoreLabel": {
+            "S": "Round Wins"
+          },
+          "targetScore": {
+            "N": "2"
+          },
+          "seedingMode": {
+            "S": "random"
+          },
+          "isStarted": {
+            "BOOL": false
+          },
+          "participants": {
+            "L": [
+              {
+                "M": {
+                  "id": {
+                    "S": "5bccb192-0acb-482d-a08d-4d7d6b630f94"
+                  },
+                  "name": {
+                    "S": "Hayden Jackson 78"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "fcf9f3af-fc6a-4a1f-a1ab-f8cbdf176b85"
+                  },
+                  "name": {
+                    "S": "Rowan White 61"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "a2b66192-9d0c-4f63-878d-4dc1a09f43e9"
+                  },
+                  "name": {
+                    "S": "Drew Taylor 69"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "bb64c1ee-7fde-4c2b-b5f1-59d83905a668"
+                  },
+                  "name": {
+                    "S": "Avery Anderson 40"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "8c36f84f-1eab-4de8-8822-1873a814fa1a"
+                  },
+                  "name": {
+                    "S": "Rowan White 83"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "76efc9f2-5e22-468a-a77a-b13894954c54"
+                  },
+                  "name": {
+                    "S": "Parker Martin 35"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "3ff1bf86-29eb-49f8-944e-70d32c0cfcae"
+                  },
+                  "name": {
+                    "S": "Rowan Wilson 81"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "a89ddb2f-2164-42a8-ad04-2d0665625460"
+                  },
+                  "name": {
+                    "S": "Rowan Moore 31"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "eda56583-f294-417f-8e74-12aab338516d"
+                  },
+                  "name": {
+                    "S": "Jordan Anderson 4"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "2985ef62-2d28-4e0c-b5a3-c684e9472da4"
+                  },
+                  "name": {
+                    "S": "Emerson Moore 69"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "d3d6d54b-5003-4557-982e-94969675758c"
+                  },
+                  "name": {
+                    "S": "Quinn Taylor 73"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "b9dc41d9-4ceb-42ec-b8b2-944d4c4f9273"
+                  },
+                  "name": {
+                    "S": "Casey White 27"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "c5fc2e7d-b10c-44db-87d5-f8ff2ef6083d"
+                  },
+                  "name": {
+                    "S": "Hayden Davis 64"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "b96ca766-63eb-4be2-b7a0-6f0182493460"
+                  },
+                  "name": {
+                    "S": "Taylor Anderson 13"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "9526958e-ae29-40ad-a599-bed2a4298db2"
+                  },
+                  "name": {
+                    "S": "Avery Taylor 3"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "676d6f5a-0514-4d62-8e64-28fb258e4925"
+                  },
+                  "name": {
+                    "S": "Finley Martin 32"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              }
+            ]
+          },
+          "matches": {
+            "L": []
+          },
+          "currentRound": {
+            "N": "1"
+          },
+          "totalRounds": {
+            "N": "0"
+          },
+          "finalizedRounds": {
+            "L": []
+          },
+          "createdAt": {
+            "N": "1769787050665"
+          },
+          "updatedAt": {
+            "N": "1769787050665"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "331015b5-f5d6-4781-97e3-45f50cb5f5b5"
+          },
+          "name": {
+            "S": "Tekken Test 1 #4214"
+          },
+          "game": {
+            "S": "Tekken"
+          },
+          "scoringMode": {
+            "S": "best_of"
+          },
+          "scoreLabel": {
+            "S": "Round Wins"
+          },
+          "targetScore": {
+            "N": "3"
+          },
+          "seedingMode": {
+            "S": "random"
+          },
+          "isStarted": {
+            "BOOL": false
+          },
+          "participants": {
+            "L": [
+              {
+                "M": {
+                  "id": {
+                    "S": "6be89be6-9fe6-4599-9900-3514762483d3"
+                  },
+                  "name": {
+                    "S": "Taylor Williams 89"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "0d27a4a1-fba6-408b-8520-934758dd597a"
+                  },
+                  "name": {
+                    "S": "Cameron Moore 13"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "71a36d0e-2792-4595-b2d3-ca8b9c7dc191"
+                  },
+                  "name": {
+                    "S": "Alex Anderson 64"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "404aa094-5a1a-439b-b0c2-016cc79a32fb"
+                  },
+                  "name": {
+                    "S": "Finley Taylor 73"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "69065371-c2a4-4e93-a0a8-04a5a392e73e"
+                  },
+                  "name": {
+                    "S": "Alex White 24"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "c60c1261-1957-4d09-ba71-e93e4d7b81eb"
+                  },
+                  "name": {
+                    "S": "Finley Martin 42"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "7ed2cac3-b744-4547-b0a1-801a5086ce34"
+                  },
+                  "name": {
+                    "S": "Parker Jackson 10"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "75c6e58d-0a6f-40cb-b564-0acc9996460e"
+                  },
+                  "name": {
+                    "S": "Jordan Harris 37"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "668d0e41-ca56-4088-8afd-c41e413e798f"
+                  },
+                  "name": {
+                    "S": "Parker Harris 36"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "24334f7a-080c-4a60-b002-8ffbaa134d06"
+                  },
+                  "name": {
+                    "S": "Casey Smith 9"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              }
+            ]
+          },
+          "matches": {
+            "L": []
+          },
+          "currentRound": {
+            "N": "1"
+          },
+          "totalRounds": {
+            "N": "0"
+          },
+          "finalizedRounds": {
+            "L": []
+          },
+          "createdAt": {
+            "N": "1769787050665"
+          },
+          "updatedAt": {
+            "N": "1769787050665"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "9cf9bc48-5c6f-44a6-99ca-993be488977b"
+          },
+          "name": {
+            "S": "Call of Duty (1v1) Test 1 #9352"
+          },
+          "game": {
+            "S": "Call of Duty (1v1)"
+          },
+          "scoringMode": {
+            "S": "higher_score"
+          },
+          "scoreLabel": {
+            "S": "Kills"
+          },
+          "seedingMode": {
+            "S": "random"
+          },
+          "isStarted": {
+            "BOOL": false
+          },
+          "participants": {
+            "L": [
+              {
+                "M": {
+                  "id": {
+                    "S": "83b3925f-36b5-4ea2-a4d0-67bffaf51e39"
+                  },
+                  "name": {
+                    "S": "Jordan Johnson 39"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "74214a3e-ff2f-414e-b42b-5ed82c046398"
+                  },
+                  "name": {
+                    "S": "Alex Williams 89"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "4a5e063a-630f-4ae6-8f9e-594af4c274c3"
+                  },
+                  "name": {
+                    "S": "Riley Johnson 20"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "7e4d9a45-2a43-4a4e-8c67-5171acb39510"
+                  },
+                  "name": {
+                    "S": "Parker Davis 54"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "9f99a6c1-0de6-4dd0-8d85-2fc57bd7b385"
+                  },
+                  "name": {
+                    "S": "Rowan Wilson 64"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "36f24066-33da-4921-b765-ef0b5cb3e42b"
+                  },
+                  "name": {
+                    "S": "Taylor Harris 92"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "a6b46296-7154-45c3-b48a-b0c94d154e5c"
+                  },
+                  "name": {
+                    "S": "Casey Johnson 21"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "b5f17a0f-c86c-4ee0-b697-a4b24a18809e"
+                  },
+                  "name": {
+                    "S": "Jordan Johnson 62"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "501c1001-da8f-45ee-a9c5-75759b6328f5"
+                  },
+                  "name": {
+                    "S": "Morgan Anderson 19"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "0a1e731b-34a0-433a-a3e3-1c30e36bde4c"
+                  },
+                  "name": {
+                    "S": "Alex Brown 25"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "6daf2556-3070-431d-a732-e010e9ee6a4e"
+                  },
+                  "name": {
+                    "S": "Jordan Anderson 20"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              }
+            ]
+          },
+          "matches": {
+            "L": []
+          },
+          "currentRound": {
+            "N": "1"
+          },
+          "totalRounds": {
+            "N": "0"
+          },
+          "finalizedRounds": {
+            "L": []
+          },
+          "createdAt": {
+            "N": "1769787050665"
+          },
+          "updatedAt": {
+            "N": "1769787050665"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "c0a80596-7faa-45c5-b546-2b1639945633"
+          },
+          "name": {
+            "S": "Call of Duty (Search) Test 1 #3111"
+          },
+          "game": {
+            "S": "Call of Duty (Search)"
+          },
+          "scoringMode": {
+            "S": "best_of"
+          },
+          "scoreLabel": {
+            "S": "Round Wins"
+          },
+          "targetScore": {
+            "N": "6"
+          },
+          "seedingMode": {
+            "S": "random"
+          },
+          "isStarted": {
+            "BOOL": false
+          },
+          "participants": {
+            "L": [
+              {
+                "M": {
+                  "id": {
+                    "S": "cd56706d-e87e-496d-98c3-b88a80e21578"
+                  },
+                  "name": {
+                    "S": "Drew White 16"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "03be490f-eebf-482a-bbae-5ec81c1eb929"
+                  },
+                  "name": {
+                    "S": "Drew Lee 47"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "ea7b6107-8e0e-4c0e-b61a-eb7dfd329217"
+                  },
+                  "name": {
+                    "S": "Reese Davis 82"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "45695a22-8fb1-4fec-8926-916310529027"
+                  },
+                  "name": {
+                    "S": "Avery White 51"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "94bcf277-1f1a-4e71-ad4a-61e544afbfc8"
+                  },
+                  "name": {
+                    "S": "Riley Jackson 71"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "9355a9da-1140-4889-b182-c39e94475c12"
+                  },
+                  "name": {
+                    "S": "Reese Brown 92"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "d52a2811-9d2f-4134-839f-3b318d77faab"
+                  },
+                  "name": {
+                    "S": "Taylor Jackson 84"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "2438df90-8b95-48c3-9717-73f3ce57c9cc"
+                  },
+                  "name": {
+                    "S": "Parker Moore 45"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "a7a4bcce-8a29-4bc6-a78d-93d8d5ec75a3"
+                  },
+                  "name": {
+                    "S": "Quinn Martin 82"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "f9619916-c93b-439a-85ed-fa0f12bf6ef0"
+                  },
+                  "name": {
+                    "S": "Alex Lee 77"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "fb601bbd-a582-47cb-a7b0-f6b35d0e9763"
+                  },
+                  "name": {
+                    "S": "Avery Miller 88"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              }
+            ]
+          },
+          "matches": {
+            "L": []
+          },
+          "currentRound": {
+            "N": "1"
+          },
+          "totalRounds": {
+            "N": "0"
+          },
+          "finalizedRounds": {
+            "L": []
+          },
+          "createdAt": {
+            "N": "1769787050665"
+          },
+          "updatedAt": {
+            "N": "1769787050665"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "37e2928b-3712-468c-bd4d-49906befb690"
+          },
+          "name": {
+            "S": "Apex Legends Test 1 #9705"
+          },
+          "game": {
+            "S": "Apex Legends"
+          },
+          "scoringMode": {
+            "S": "higher_score"
+          },
+          "scoreLabel": {
+            "S": "Kills"
+          },
+          "seedingMode": {
+            "S": "random"
+          },
+          "isStarted": {
+            "BOOL": false
+          },
+          "participants": {
+            "L": [
+              {
+                "M": {
+                  "id": {
+                    "S": "40102140-aec9-4678-a2d8-32e170867289"
+                  },
+                  "name": {
+                    "S": "Morgan Harris 42"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "f5f42359-17d8-48f3-983c-154156fd8378"
+                  },
+                  "name": {
+                    "S": "Riley Davis 64"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "94fc9384-c513-4987-b23f-712994d37c6d"
+                  },
+                  "name": {
+                    "S": "Drew Wilson 71"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "856300e5-4788-4639-ada3-349972f9e1ba"
+                  },
+                  "name": {
+                    "S": "Morgan Johnson 66"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "9c511815-251e-44be-9421-014520e67fe9"
+                  },
+                  "name": {
+                    "S": "Finley Wilson 86"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "7bbaaf2e-9eba-475d-a3bf-b3f5bf78d6ed"
+                  },
+                  "name": {
+                    "S": "Emerson Lee 88"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "32702342-c99a-4fcb-85b3-e9483f5a6ade"
+                  },
+                  "name": {
+                    "S": "Jordan White 56"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "2f297cb7-8ab3-4584-81ce-3cbe5e647470"
+                  },
+                  "name": {
+                    "S": "Riley Miller 57"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "b697ee8f-2a70-40ea-a417-957ff3e19928"
+                  },
+                  "name": {
+                    "S": "Parker Wilson 92"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "d7afadbe-5e29-4d4e-b789-9958e3ea4a01"
+                  },
+                  "name": {
+                    "S": "Morgan Miller 31"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "1377506c-e1d6-40b2-bf90-3ce06a71e7ef"
+                  },
+                  "name": {
+                    "S": "Parker Thomas 79"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "6e4d4e91-f753-4d83-8dcd-a47908e956f3"
+                  },
+                  "name": {
+                    "S": "Riley White 37"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              }
+            ]
+          },
+          "matches": {
+            "L": []
+          },
+          "currentRound": {
+            "N": "1"
+          },
+          "totalRounds": {
+            "N": "0"
+          },
+          "finalizedRounds": {
+            "L": []
+          },
+          "createdAt": {
+            "N": "1769787050665"
+          },
+          "updatedAt": {
+            "N": "1769787050665"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "3780915d-ffc1-46d3-98fe-4aaf2d8aebdb"
+          },
+          "name": {
+            "S": "Valorant Test 1 #3046"
+          },
+          "game": {
+            "S": "Valorant"
+          },
+          "scoringMode": {
+            "S": "best_of"
+          },
+          "scoreLabel": {
+            "S": "Round Wins"
+          },
+          "targetScore": {
+            "N": "13"
+          },
+          "seedingMode": {
+            "S": "random"
+          },
+          "isStarted": {
+            "BOOL": false
+          },
+          "participants": {
+            "L": [
+              {
+                "M": {
+                  "id": {
+                    "S": "d1c97823-064e-46c4-bbab-80e5003c602e"
+                  },
+                  "name": {
+                    "S": "Reese Johnson 59"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "eb4e9e00-91d5-4bfe-8bad-9723b6748e31"
+                  },
+                  "name": {
+                    "S": "Alex White 40"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "2b81ea95-4dc9-4231-9bc9-d560f38fc497"
+                  },
+                  "name": {
+                    "S": "Morgan Jackson 72"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "dee69606-2a62-4a37-88a8-d82809260936"
+                  },
+                  "name": {
+                    "S": "Parker Thomas 56"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "30962455-2e49-42cf-92cf-bd9be5aef83a"
+                  },
+                  "name": {
+                    "S": "Morgan Wilson 93"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "502f3bb9-9f3a-4089-855f-ba2bb9525ea3"
+                  },
+                  "name": {
+                    "S": "Casey Davis 25"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "94269ee6-8ef3-4b29-a54f-3cf1137beba8"
+                  },
+                  "name": {
+                    "S": "Casey Thomas 86"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "ef91e123-fde7-4540-8142-a04d886cdf1e"
+                  },
+                  "name": {
+                    "S": "Avery White 33"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "20698aff-0fd7-4d6e-bcf5-022ece9e8a8e"
+                  },
+                  "name": {
+                    "S": "Riley Brown 40"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "b2117063-7226-4790-8823-280d9eded6eb"
+                  },
+                  "name": {
+                    "S": "Morgan Jackson 38"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "28ef154c-c17a-4c0b-a492-e84642610d3e"
+                  },
+                  "name": {
+                    "S": "Hayden Anderson 35"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "b370f4aa-d15d-48bb-9d5f-1053f152b659"
+                  },
+                  "name": {
+                    "S": "Quinn Brown 55"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "23d971a8-0ba9-4f69-bd07-d43fff5a3f21"
+                  },
+                  "name": {
+                    "S": "Reese White 67"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              }
+            ]
+          },
+          "matches": {
+            "L": []
+          },
+          "currentRound": {
+            "N": "1"
+          },
+          "totalRounds": {
+            "N": "0"
+          },
+          "finalizedRounds": {
+            "L": []
+          },
+          "createdAt": {
+            "N": "1769787050665"
+          },
+          "updatedAt": {
+            "N": "1769787050665"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "79a04ea0-de1b-4dc1-9b93-82a0d513ace5"
+          },
+          "name": {
+            "S": "Counter-Strike 2 Test 1 #2330"
+          },
+          "game": {
+            "S": "Counter-Strike 2"
+          },
+          "scoringMode": {
+            "S": "best_of"
+          },
+          "scoreLabel": {
+            "S": "Round Wins"
+          },
+          "targetScore": {
+            "N": "13"
+          },
+          "seedingMode": {
+            "S": "random"
+          },
+          "isStarted": {
+            "BOOL": false
+          },
+          "participants": {
+            "L": [
+              {
+                "M": {
+                  "id": {
+                    "S": "9b8301d3-3f32-4c6c-8ecc-52266dcc0410"
+                  },
+                  "name": {
+                    "S": "Emerson Williams 29"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "158d78e6-d9ab-4388-a289-8c3957498216"
+                  },
+                  "name": {
+                    "S": "Morgan Anderson 99"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "8437f729-f69b-4bbf-be22-f03d85f4feef"
+                  },
+                  "name": {
+                    "S": "Taylor Jackson 69"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "61c78d8b-cb1a-400f-9536-e8f9c4cf49d8"
+                  },
+                  "name": {
+                    "S": "Finley Harris 27"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "4827a492-95ad-4b8a-8913-0b4f9e29b380"
+                  },
+                  "name": {
+                    "S": "Avery Davis 91"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "c2f893ab-d774-4038-b473-2e6e4a6ceeb4"
+                  },
+                  "name": {
+                    "S": "Casey Brown 46"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "ed16937e-d9d3-4622-aefa-27f8c73ce88f"
+                  },
+                  "name": {
+                    "S": "Quinn Davis 64"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "7092eafa-8cde-47fe-a103-b3f142dff2e8"
+                  },
+                  "name": {
+                    "S": "Avery Lee 36"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "81b231cc-1b0d-4bf7-83e2-148e234a3975"
+                  },
+                  "name": {
+                    "S": "Drew Wilson 57"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "90014bb0-aa1b-4771-a12e-fe06a84314ef"
+                  },
+                  "name": {
+                    "S": "Riley Wilson 67"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "ab410854-aab9-4f3e-b6bb-4072d3e2dd8b"
+                  },
+                  "name": {
+                    "S": "Cameron White 16"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "f9bae611-bd40-461d-9b24-49121087e841"
+                  },
+                  "name": {
+                    "S": "Morgan Johnson 76"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "ad259efd-6f08-4e0e-82c6-10e2cb3b0a0a"
+                  },
+                  "name": {
+                    "S": "Riley Taylor 19"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "44664977-b145-44f9-92b4-4cee777b8f85"
+                  },
+                  "name": {
+                    "S": "Drew Johnson 87"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              }
+            ]
+          },
+          "matches": {
+            "L": []
+          },
+          "currentRound": {
+            "N": "1"
+          },
+          "totalRounds": {
+            "N": "0"
+          },
+          "finalizedRounds": {
+            "L": []
+          },
+          "createdAt": {
+            "N": "1769787050665"
+          },
+          "updatedAt": {
+            "N": "1769787050665"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "c208a15f-4896-47ad-94df-b4075048f73f"
+          },
+          "name": {
+            "S": "Mario Kart Test 1 #3671"
+          },
+          "game": {
+            "S": "Mario Kart"
+          },
+          "scoringMode": {
+            "S": "higher_score"
+          },
+          "scoreLabel": {
+            "S": "Points"
+          },
+          "seedingMode": {
+            "S": "random"
+          },
+          "isStarted": {
+            "BOOL": false
+          },
+          "participants": {
+            "L": [
+              {
+                "M": {
+                  "id": {
+                    "S": "f8345eaa-78ef-45c0-9392-96ba04738624"
+                  },
+                  "name": {
+                    "S": "Drew Anderson 70"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "2ee49faf-74ef-48e2-b1cb-8e1c83541c28"
+                  },
+                  "name": {
+                    "S": "Drew Martin 44"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "ffaf0422-e29f-40d2-ab47-afaa7540a6f7"
+                  },
+                  "name": {
+                    "S": "Parker Martin 8"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "8ecd1369-64ac-4783-8ec3-a1b33ac61e5b"
+                  },
+                  "name": {
+                    "S": "Taylor Wilson 64"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "83cc8ddb-61fe-424b-9333-68019f364ca7"
+                  },
+                  "name": {
+                    "S": "Finley Jackson 70"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "35dc52c0-93bb-4870-b205-f950446fe208"
+                  },
+                  "name": {
+                    "S": "Avery Miller 64"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "53f0463c-a1f4-4a33-a14b-d776090b04bc"
+                  },
+                  "name": {
+                    "S": "Hayden Thomas 96"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "339bff87-88cb-40f6-8d5d-6a17637e0332"
+                  },
+                  "name": {
+                    "S": "Reese Martin 9"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "5f854f1f-1c04-4408-8aa3-3d5f45afa2d1"
+                  },
+                  "name": {
+                    "S": "Morgan Johnson 44"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "5d125bdc-1f7e-4eea-9b4d-61839787279e"
+                  },
+                  "name": {
+                    "S": "Taylor Brown 57"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "7ada19c5-0f13-4aea-a151-bbc6b0ef0a9c"
+                  },
+                  "name": {
+                    "S": "Taylor Moore 15"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "be3d8a6c-e164-44c2-add9-120a8f149798"
+                  },
+                  "name": {
+                    "S": "Hayden Anderson 80"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "b032a9b5-9268-48a9-a31d-967cc59f88d3"
+                  },
+                  "name": {
+                    "S": "Casey White 22"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              }
+            ]
+          },
+          "matches": {
+            "L": []
+          },
+          "currentRound": {
+            "N": "1"
+          },
+          "totalRounds": {
+            "N": "0"
+          },
+          "finalizedRounds": {
+            "L": []
+          },
+          "createdAt": {
+            "N": "1769787050665"
+          },
+          "updatedAt": {
+            "N": "1769787050665"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "b1a360ac-09d2-400d-b734-5277e4cf4c06"
+          },
+          "name": {
+            "S": "Gran Turismo Test 1 #9559"
+          },
+          "game": {
+            "S": "Gran Turismo"
+          },
+          "scoringMode": {
+            "S": "lower_score"
+          },
+          "scoreLabel": {
+            "S": "Position"
+          },
+          "seedingMode": {
+            "S": "random"
+          },
+          "isStarted": {
+            "BOOL": false
+          },
+          "participants": {
+            "L": [
+              {
+                "M": {
+                  "id": {
+                    "S": "6421731f-d210-4a0f-97eb-2be77843d900"
+                  },
+                  "name": {
+                    "S": "Taylor Davis 57"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "a78f39ed-6ab0-464a-bf89-372887549e05"
+                  },
+                  "name": {
+                    "S": "Finley Anderson 34"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "4e77d6b1-1b20-4441-8449-f70e80dc8aae"
+                  },
+                  "name": {
+                    "S": "Drew Brown 31"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "7639b15e-0175-4ed9-8a67-0848a205e26c"
+                  },
+                  "name": {
+                    "S": "Morgan Brown 70"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "b2cc3176-57c1-4169-a85e-d543ffaaa4c7"
+                  },
+                  "name": {
+                    "S": "Drew White 19"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "1895ff74-a95d-4f01-ba18-121aa5f63fd8"
+                  },
+                  "name": {
+                    "S": "Jordan Davis 5"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "0a43c1f8-fe8a-4232-b930-b4b8064b3d46"
+                  },
+                  "name": {
+                    "S": "Finley Jackson 83"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              }
+            ]
+          },
+          "matches": {
+            "L": []
+          },
+          "currentRound": {
+            "N": "1"
+          },
+          "totalRounds": {
+            "N": "0"
+          },
+          "finalizedRounds": {
+            "L": []
+          },
+          "createdAt": {
+            "N": "1769787050665"
+          },
+          "updatedAt": {
+            "N": "1769787050665"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "2dd56393-120a-4a7e-bc07-a8410106c8a5"
+          },
+          "name": {
+            "S": "Forza Test 1 #8663"
+          },
+          "game": {
+            "S": "Forza"
+          },
+          "scoringMode": {
+            "S": "lower_score"
+          },
+          "scoreLabel": {
+            "S": "Position"
+          },
+          "seedingMode": {
+            "S": "random"
+          },
+          "isStarted": {
+            "BOOL": false
+          },
+          "participants": {
+            "L": [
+              {
+                "M": {
+                  "id": {
+                    "S": "5226f20e-c57d-4d54-8013-5296f4b9a927"
+                  },
+                  "name": {
+                    "S": "Riley White 82"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "685a0b07-1391-459d-9f45-3798258c0b87"
+                  },
+                  "name": {
+                    "S": "Drew Brown 28"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "c714a695-6e7a-4f72-8806-146d9e47ae29"
+                  },
+                  "name": {
+                    "S": "Drew Harris 40"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "fa9bbb25-79ef-4084-a466-5168696beb18"
+                  },
+                  "name": {
+                    "S": "Reese Martin 32"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "65da9704-2fce-4617-a2f0-c92d1d910794"
+                  },
+                  "name": {
+                    "S": "Reese Moore 71"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "3747aeb3-e8db-4c37-b954-6545388d9e71"
+                  },
+                  "name": {
+                    "S": "Rowan Anderson 31"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "5412a7cd-ad01-4118-80e3-f25eee57a470"
+                  },
+                  "name": {
+                    "S": "Reese Wilson 81"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "c2f60477-a2e7-4ec7-81c1-90e93c866f40"
+                  },
+                  "name": {
+                    "S": "Rowan Harris 92"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "f20dfc9f-a39d-44b3-9ef8-63e645079d44"
+                  },
+                  "name": {
+                    "S": "Finley White 59"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "5118d347-8a8e-4a0c-850c-759df35b5014"
+                  },
+                  "name": {
+                    "S": "Riley Lee 14"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "235fdc3f-ae20-43a8-a263-3d0be2ce9aaa"
+                  },
+                  "name": {
+                    "S": "Cameron Smith 49"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "cfab78f8-3a81-4d9c-86f1-02f72ca89ca0"
+                  },
+                  "name": {
+                    "S": "Rowan Lee 77"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "8d7d4d75-44c2-48c1-9b21-84195dab4784"
+                  },
+                  "name": {
+                    "S": "Reese Smith 61"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "977f98f1-466d-4957-aacd-fb01dba93298"
+                  },
+                  "name": {
+                    "S": "Drew Wilson 95"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "2d10689b-7603-4f57-83d4-48a578280f48"
+                  },
+                  "name": {
+                    "S": "Emerson Harris 85"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "32840c00-4ca6-4bcf-b64e-4612ce937196"
+                  },
+                  "name": {
+                    "S": "Drew Smith 73"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              }
+            ]
+          },
+          "matches": {
+            "L": []
+          },
+          "currentRound": {
+            "N": "1"
+          },
+          "totalRounds": {
+            "N": "0"
+          },
+          "finalizedRounds": {
+            "L": []
+          },
+          "createdAt": {
+            "N": "1769787050665"
+          },
+          "updatedAt": {
+            "N": "1769787050665"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "7e87ccb5-a1a1-4d58-bb23-dba596df025a"
+          },
+          "name": {
+            "S": "Chess Test 1 #4688"
+          },
+          "game": {
+            "S": "Chess"
+          },
+          "scoringMode": {
+            "S": "best_of"
+          },
+          "scoreLabel": {
+            "S": "Wins"
+          },
+          "targetScore": {
+            "N": "2"
+          },
+          "seedingMode": {
+            "S": "random"
+          },
+          "isStarted": {
+            "BOOL": false
+          },
+          "participants": {
+            "L": [
+              {
+                "M": {
+                  "id": {
+                    "S": "cb997ace-99ab-45a1-ad6b-ab1d10d76598"
+                  },
+                  "name": {
+                    "S": "Parker Jackson 99"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "cc0ed752-b1ba-4bd9-9d82-cb769839c376"
+                  },
+                  "name": {
+                    "S": "Quinn Thomas 30"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "c9b60319-49a2-44c5-b9f9-1165eabb615d"
+                  },
+                  "name": {
+                    "S": "Drew Miller 82"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "b06ae85e-f136-4dff-b063-f0527d22e977"
+                  },
+                  "name": {
+                    "S": "Emerson Davis 58"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "797d2b6e-55b6-40ee-bd75-ff56c60781e3"
+                  },
+                  "name": {
+                    "S": "Rowan Thomas 63"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "a90688a4-eb09-4c1e-9942-5bfed26fa2d2"
+                  },
+                  "name": {
+                    "S": "Hayden Brown 18"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "5fe5ce57-7bb3-4d19-adb5-22d4bb339440"
+                  },
+                  "name": {
+                    "S": "Emerson Williams 67"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "687955e6-653e-498e-bf9d-e5ba776b6e2c"
+                  },
+                  "name": {
+                    "S": "Avery Lee 21"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "2e758a63-bf6a-4863-a54e-4349e88c9188"
+                  },
+                  "name": {
+                    "S": "Taylor Moore 29"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "1abcbd26-9c9c-421e-82fe-4ca1663296d6"
+                  },
+                  "name": {
+                    "S": "Finley Smith 99"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "75023648-0c57-41e4-bf24-9f8bb37b1aa3"
+                  },
+                  "name": {
+                    "S": "Morgan Davis 75"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "bf4e957c-f1a0-4dc3-9ef9-9334107048f2"
+                  },
+                  "name": {
+                    "S": "Cameron Johnson 12"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "93551f5b-f114-4cbc-bcd0-57c9854cc74d"
+                  },
+                  "name": {
+                    "S": "Casey Miller 25"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "c3f96335-e1ae-4c36-ae5c-856bcd2c88b5"
+                  },
+                  "name": {
+                    "S": "Quinn Brown 38"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "c8ea551a-9c0a-44bf-80cf-7a95a1eeaae1"
+                  },
+                  "name": {
+                    "S": "Morgan Johnson 63"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              }
+            ]
+          },
+          "matches": {
+            "L": []
+          },
+          "currentRound": {
+            "N": "1"
+          },
+          "totalRounds": {
+            "N": "0"
+          },
+          "finalizedRounds": {
+            "L": []
+          },
+          "createdAt": {
+            "N": "1769787050665"
+          },
+          "updatedAt": {
+            "N": "1769787050665"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "c4bb95b1-414f-4e01-9a1b-821845135b79"
+          },
+          "name": {
+            "S": "Mario Party Test 1 #9820"
+          },
+          "game": {
+            "S": "Mario Party"
+          },
+          "scoringMode": {
+            "S": "higher_score"
+          },
+          "scoreLabel": {
+            "S": "Stars"
+          },
+          "seedingMode": {
+            "S": "random"
+          },
+          "isStarted": {
+            "BOOL": false
+          },
+          "participants": {
+            "L": [
+              {
+                "M": {
+                  "id": {
+                    "S": "65583ae5-6f5f-4025-a75c-caed76622b8d"
+                  },
+                  "name": {
+                    "S": "Finley Jackson 73"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "889c0c36-7bb1-408d-a2cf-2e82741177dd"
+                  },
+                  "name": {
+                    "S": "Taylor Johnson 2"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "87b381e0-fbdb-4da4-b084-da2246656196"
+                  },
+                  "name": {
+                    "S": "Alex Martin 62"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "0701d1c1-c28b-405a-a28b-ef3649f8d262"
+                  },
+                  "name": {
+                    "S": "Cameron White 34"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "592bfa6e-7c5e-440f-ad9f-180c64e55fbe"
+                  },
+                  "name": {
+                    "S": "Morgan Martin 8"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "1cefbfe2-f29a-4af5-b361-4adfdd10130f"
+                  },
+                  "name": {
+                    "S": "Riley Davis 32"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "503837e5-48e6-4c17-873a-cf3d14fc9a48"
+                  },
+                  "name": {
+                    "S": "Rowan Harris 64"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "bea22c21-9d6e-4d88-8b54-24e8a0c761a1"
+                  },
+                  "name": {
+                    "S": "Avery Smith 39"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "ad6eeba9-db41-4e75-b9c9-33e80c57ea98"
+                  },
+                  "name": {
+                    "S": "Emerson Wilson 92"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "c41333b2-03ec-4fc2-a81a-ab2692cf0414"
+                  },
+                  "name": {
+                    "S": "Drew Harris 59"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "aad6f4ad-7f89-4e5c-89ec-d98c5b7ac81b"
+                  },
+                  "name": {
+                    "S": "Parker Taylor 25"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "27e009bf-15fb-4e00-8ee9-ba4f76a14609"
+                  },
+                  "name": {
+                    "S": "Finley Miller 4"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "c597de7d-4fb5-4d24-b352-bf3669362c85"
+                  },
+                  "name": {
+                    "S": "Finley Lee 55"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "d42e6764-480c-4a93-8112-4e9e3c05e149"
+                  },
+                  "name": {
+                    "S": "Jordan Thomas 22"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "9e55f4b7-1268-45bb-a088-c8ab6875442d"
+                  },
+                  "name": {
+                    "S": "Reese Brown 53"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              }
+            ]
+          },
+          "matches": {
+            "L": []
+          },
+          "currentRound": {
+            "N": "1"
+          },
+          "totalRounds": {
+            "N": "0"
+          },
+          "finalizedRounds": {
+            "L": []
+          },
+          "createdAt": {
+            "N": "1769787050665"
+          },
+          "updatedAt": {
+            "N": "1769787050665"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "id": {
+            "S": "8461887e-178d-4286-917c-596450502d0a"
+          },
+          "name": {
+            "S": "Tetris Test 1 #5905"
+          },
+          "game": {
+            "S": "Tetris"
+          },
+          "scoringMode": {
+            "S": "higher_score"
+          },
+          "scoreLabel": {
+            "S": "Score"
+          },
+          "seedingMode": {
+            "S": "random"
+          },
+          "isStarted": {
+            "BOOL": false
+          },
+          "participants": {
+            "L": [
+              {
+                "M": {
+                  "id": {
+                    "S": "61c2a806-18b3-4ab8-b3a4-1fb91e5f399d"
+                  },
+                  "name": {
+                    "S": "Parker Thomas 22"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "90d5df2e-fe07-44ab-b3f5-7d3e38d5d820"
+                  },
+                  "name": {
+                    "S": "Emerson Harris 22"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "a3e82075-08d7-48f0-a403-754cf29dc039"
+                  },
+                  "name": {
+                    "S": "Cameron Anderson 58"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "21ee73ea-b624-4e4f-bd7b-af231757dfc0"
+                  },
+                  "name": {
+                    "S": "Morgan Davis 40"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "083277a3-01f8-4054-9438-9aaf3d28f231"
+                  },
+                  "name": {
+                    "S": "Hayden Miller 27"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              },
+              {
+                "M": {
+                  "id": {
+                    "S": "d7259d16-3612-422b-9236-8724e8f155e2"
+                  },
+                  "name": {
+                    "S": "Taylor Brown 16"
+                  },
+                  "gamePoints": {
+                    "N": "0"
+                  }
+                }
+              }
+            ]
+          },
+          "matches": {
+            "L": []
+          },
+          "currentRound": {
+            "N": "1"
+          },
+          "totalRounds": {
+            "N": "0"
+          },
+          "finalizedRounds": {
+            "L": []
+          },
+          "createdAt": {
+            "N": "1769787050665"
+          },
+          "updatedAt": {
+            "N": "1769787050665"
+          }
+        }
+      }
+    }
+  ]
+}

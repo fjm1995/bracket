@@ -169,6 +169,20 @@ export function TournamentProvider({ children }: { children: React.ReactNode }) 
           break;
         }
 
+        case 'FINALIZE_ROUND': {
+          const tournament = await db.finalizeRound(
+            action.payload.tournamentId,
+            action.payload.round
+          );
+          setState(prev => ({
+            ...prev,
+            tournaments: prev.tournaments.map(t =>
+              t.id === tournament.id ? tournament : t
+            )
+          }));
+          break;
+        }
+
         case 'SET_ACTIVE_TOURNAMENT': {
           setState(prev => ({
             ...prev,

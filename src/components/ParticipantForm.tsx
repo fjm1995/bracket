@@ -14,6 +14,7 @@ const AnimatePresenceWrapper = AnimatePresence as React.FC<{
 
 interface ParticipantFormProps {
   tournamentId: string;
+  variant?: 'panel' | 'modal';
 }
 
 interface ParticipantItemProps {
@@ -25,11 +26,12 @@ interface ParticipantItemProps {
 }
 
 const statusConfig = {
-  winner: { badge: 'bg-yellow-100 text-yellow-800', icon: '🏆', text: 'Champion' },
-  advanced: { badge: 'bg-green-100 text-green-800', icon: '✓', text: 'Advanced' },
-  playing: { badge: 'bg-blue-100 text-blue-800', icon: '⚔️', text: 'Playing' },
-  waiting: { badge: 'bg-gray-100 text-gray-600', icon: '⏳', text: 'Waiting' },
-  eliminated: { badge: 'bg-red-100 text-red-800', icon: '✗', text: 'Eliminated' }
+  champion: { bg: 'bg-amber-50', border: 'border-amber-200', icon: '🏆', text: 'Champion', color: 'text-amber-700' },
+  advanced: { bg: 'bg-apple-green/5', border: 'border-apple-green/20', icon: '✓', text: 'Advanced', color: 'text-apple-green' },
+  playing: { bg: 'bg-apple-blue/5', border: 'border-apple-blue/20', icon: '⚡', text: 'Playing', color: 'text-apple-blue' },
+  waiting: { bg: 'bg-apple-gray-50', border: 'border-apple-gray-200', icon: '⏳', text: 'Waiting', color: 'text-apple-gray-500' },
+  eliminated: { bg: 'bg-apple-red/5', border: 'border-apple-red/10', icon: '✗', text: 'Eliminated', color: 'text-apple-red' },
+  bye: { bg: 'bg-purple-50', border: 'border-purple-200', icon: '⏭️', text: 'Bye (Auto-Advanced)', color: 'text-purple-700' }
 };
 
 const ParticipantItem = memo(function ParticipantItem({
@@ -45,57 +47,66 @@ const ParticipantItem = memo(function ParticipantItem({
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, y: -10 }}
+      initial={{ opacity: 0, y: -8 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, x: -20 }}
-      className={`flex items-center justify-between p-3 rounded-lg border transition-all
-        ${status === 'winner' 
-          ? 'bg-gradient-to-r from-yellow-50 to-amber-50 border-yellow-300' 
-          : status === 'eliminated' 
-          ? 'bg-red-50 border-red-200 opacity-70'
-          : 'bg-gray-50 border-gray-200 hover:bg-gray-100'}`}
+      exit={{ opacity: 0, x: -16 }}
+      className={`flex items-center gap-3 p-3 rounded-apple border transition-all ${config.bg} ${config.border}
+                  ${status === 'eliminated' ? 'opacity-60' : ''}`}
     >
-      <div className="flex items-center space-x-3 min-w-0 flex-1">
-        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold text-sm">
-          {participant.name.charAt(0).toUpperCase()}
-        </div>
-        <div className="min-w-0 flex-1">
-          <p className={`font-medium truncate ${status === 'winner' ? 'text-yellow-800' : 'text-gray-900'}`}>
-            {participant.name}
-          </p>
-          <div className="flex items-center space-x-2">
-            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${config.badge}`}>
-              {config.icon} {config.text}
-            </span>
-            <span className="text-xs text-gray-500">
+      {/* Avatar */}
+      <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm
+                       ${status === 'champion' 
+                         ? 'bg-amber-400 text-white' 
+                         : status === 'eliminated'
+                         ? 'bg-apple-gray-300 text-white'
+                         : 'bg-apple-blue text-white'}`}
+      >
+        {status === 'champion' ? '👑' : participant.name.charAt(0).toUpperCase()}
+      </div>
+      
+      {/* Info */}
+      <div className="flex-1 min-w-0">
+        <p className={`font-medium truncate ${status === 'champion' ? 'text-amber-800' : 'text-apple-gray-900'}`}>
+          {participant.name}
+        </p>
+        <div className="flex items-center gap-2">
+          <span className={`text-xs font-medium ${config.color}`}>
+            {config.icon} {config.text}
+          </span>
+          {tournament.isStarted && (
+            <span className="text-xs text-apple-gray-400">
               {participant.gamePoints} {tournament.scoreLabel.toLowerCase()}
             </span>
-          </div>
+          )}
         </div>
       </div>
 
-      <div className="flex items-center space-x-1 flex-shrink-0">
+      {/* Actions */}
+      <div className="flex items-center gap-1 flex-shrink-0">
         <button
           onClick={onEdit}
-          className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+          className="p-2 text-apple-gray-400 hover:text-apple-blue hover:bg-apple-blue/10 
+                     rounded-apple transition-colors"
           title="Edit name"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" 
+                  d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
           </svg>
         </button>
         <button
           onClick={onRemove}
           disabled={disableRemove}
-          className={`p-2 rounded-lg transition-colors ${
+          className={`p-2 rounded-apple transition-colors ${
             disableRemove
-              ? 'text-gray-300 cursor-not-allowed'
-              : 'text-gray-400 hover:text-red-600 hover:bg-red-50'
+              ? 'text-apple-gray-300 cursor-not-allowed'
+              : 'text-apple-gray-400 hover:text-apple-red hover:bg-apple-red/10'
           }`}
           title={disableRemove ? 'Cannot remove after start' : 'Remove participant'}
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" 
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
           </svg>
         </button>
       </div>
@@ -103,7 +114,10 @@ const ParticipantItem = memo(function ParticipantItem({
   );
 });
 
-export const ParticipantForm = memo(function ParticipantForm({ tournamentId }: ParticipantFormProps) {
+export const ParticipantForm = memo(function ParticipantForm({
+  tournamentId,
+  variant = 'panel'
+}: ParticipantFormProps) {
   const { state, dispatch } = useTournament();
   const [name, setName] = useState('');
   const [nameError, setNameError] = useState<string | null>(null);
@@ -166,7 +180,6 @@ export const ParticipantForm = memo(function ParticipantForm({ tournamentId }: P
   const handleEditSubmit = useCallback(async (newName: string) => {
     if (!editModal.participant || !tournament) return;
 
-    // Check for duplicates excluding current participant
     const otherParticipants = tournament.participants.filter(
       p => p.id !== editModal.participant!.id
     );
@@ -204,34 +217,32 @@ export const ParticipantForm = memo(function ParticipantForm({ tournamentId }: P
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="card sticky top-24"
+      className={variant === 'modal' ? 'card' : 'card sticky top-24'}
     >
       <div className="card-header">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-bold text-gray-900">Participants</h3>
-          <span className="text-sm text-blue-600 font-semibold">
-            {tournament.participants.length} {tournament.isStarted ? 'players' : 'registered'}
+          <h3 className="text-lg font-semibold text-apple-gray-900">Participants</h3>
+          <span className="badge-blue">
+            {tournament.participants.length}
           </span>
         </div>
-        {!tournament.isStarted && (
-          <p className="text-xs text-gray-500 mt-1">
-            Registration open. Start the tournament to lock the bracket.
-          </p>
-        )}
-        {tournament.isStarted && (
-          <p className="text-xs text-gray-500 mt-1">
-            Tournament in progress. Registration is closed.
-          </p>
-        )}
+        <p className="text-sm text-apple-gray-500 mt-1">
+          {tournament.isStarted 
+            ? 'Tournament in progress' 
+            : 'Registration open'
+          }
+        </p>
+        
+        {/* Progress Bar */}
         {tournamentStats && tournamentStats.totalMatches > 0 && (
-          <div className="mt-2">
-            <div className="flex justify-between text-xs text-gray-500 mb-1">
-              <span>Tournament Progress</span>
-              <span>{tournamentStats.completedMatches}/{tournamentStats.totalMatches} matches</span>
+          <div className="mt-4">
+            <div className="flex justify-between text-xs text-apple-gray-500 mb-1.5">
+              <span>Matches completed</span>
+              <span>{tournamentStats.completedMatches}/{tournamentStats.totalMatches}</span>
             </div>
-            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+            <div className="progress-track">
               <div
-                className="h-full bg-blue-600 transition-all duration-500"
+                className="progress-fill"
                 style={{
                   width: `${(tournamentStats.completedMatches / tournamentStats.totalMatches) * 100}%`
                 }}
@@ -241,9 +252,9 @@ export const ParticipantForm = memo(function ParticipantForm({ tournamentId }: P
         )}
       </div>
 
-      <div className="card-body space-y-4">
+      <div className="card-body space-y-5">
         {/* Participant List */}
-        <div className="space-y-2 max-h-[350px] overflow-y-auto pr-1">
+        <div className="space-y-2 max-h-[380px] overflow-y-auto scrollbar-apple -mx-2 px-2">
           <AnimatePresenceWrapper mode="popLayout">
             {tournament.participants.length > 0 ? (
               tournament.participants.map((participant) => (
@@ -264,57 +275,72 @@ export const ParticipantForm = memo(function ParticipantForm({ tournamentId }: P
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="text-center py-8"
+                className="text-center py-10"
               >
-                <div className="text-gray-400 mb-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-apple-gray-100 flex items-center justify-center">
+                  <svg className="w-8 h-8 text-apple-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" 
+                          d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                   </svg>
                 </div>
-                <p className="text-gray-600 text-sm">No participants yet</p>
-                <p className="text-gray-400 text-xs">Add players below to start</p>
+                <p className="text-apple-gray-600 font-medium">No participants yet</p>
+                <p className="text-apple-gray-400 text-sm mt-1">Add players to get started</p>
               </motion.div>
             )}
           </AnimatePresenceWrapper>
         </div>
 
-        {/* Add Form */}
-        <div className="border-t border-gray-200 pt-4">
-          <h4 className="text-sm font-semibold text-gray-700 mb-3">Register Participant</h4>
-          <form onSubmit={handleSubmit} className="space-y-3">
-            <div>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => {
-                  setName(e.target.value);
-                  setNameError(null);
-                }}
-                className={`bracket-input ${nameError ? 'border-red-500 focus:ring-red-500' : ''}`}
-                placeholder="Enter participant name"
-                disabled={tournament.isStarted}
-              />
-              {nameError && (
-                <p className="mt-1 text-sm text-red-600">{nameError}</p>
-              )}
-            </div>
+        {/* Add Participant Form */}
+        {!tournament.isStarted && (
+          <div className="pt-4 border-t border-apple-gray-100">
+            <form onSubmit={handleSubmit} className="space-y-3">
+              <div>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => {
+                    setName(e.target.value);
+                    setNameError(null);
+                  }}
+                  className={`input ${nameError ? 'input-error' : ''}`}
+                  placeholder="Enter player name"
+                />
+                {nameError && (
+                  <p className="mt-2 text-sm text-apple-red">{nameError}</p>
+                )}
+              </div>
 
-            <button
-              type="submit"
-              disabled={!name.trim() || isSubmitting || tournament.isStarted}
-              className="w-full btn-primary flex items-center justify-center space-x-2"
-            >
-              {isSubmitting ? (
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full loading-spinner" />
-              ) : (
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-              )}
-              <span>{isSubmitting ? 'Adding...' : 'Add Participant'}</span>
-            </button>
-          </form>
-        </div>
+              <button
+                type="submit"
+                disabled={!name.trim() || isSubmitting}
+                className="w-full btn-primary"
+              >
+                {isSubmitting ? (
+                  <>
+                    <div className="spinner" />
+                    Adding...
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m6-6H6" />
+                    </svg>
+                    Add Participant
+                  </>
+                )}
+              </button>
+            </form>
+          </div>
+        )}
+
+        {/* Locked Notice */}
+        {tournament.isStarted && (
+          <div className="py-3 px-4 bg-apple-gray-50 rounded-apple text-center">
+            <p className="text-sm text-apple-gray-500">
+              Registration closed — tournament in progress
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Edit Modal */}
@@ -326,7 +352,7 @@ export const ParticipantForm = memo(function ParticipantForm({ tournamentId }: P
         }}
         onSubmit={handleEditSubmit}
         title="Edit Participant"
-        label="Participant Name"
+        label="Player Name"
         placeholder="Enter new name"
         initialValue={editModal.participant?.name || ''}
         submitText="Save"
@@ -339,7 +365,7 @@ export const ParticipantForm = memo(function ParticipantForm({ tournamentId }: P
         onClose={() => setRemoveModal({ isOpen: false, participantId: null })}
         onConfirm={handleRemove}
         title="Remove Participant"
-        message="Are you sure you want to remove this participant? The bracket will be regenerated."
+        message="Are you sure? The bracket will be regenerated."
         confirmText="Remove"
         variant="danger"
       />

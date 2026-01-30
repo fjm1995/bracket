@@ -2,6 +2,7 @@ export interface Participant {
   id: string;
   name: string;
   gamePoints: number;
+  seed?: number; // Optional legacy field (not used for seeding byes)
 }
 
 export interface Match {
@@ -13,6 +14,8 @@ export interface Match {
   participant1Score: number;
   participant2Score: number;
   winner?: Participant | null;
+  wildCardParticipant1?: boolean;
+  wildCardParticipant2?: boolean;
 }
 
 export interface Tournament {
@@ -22,14 +25,18 @@ export interface Tournament {
   scoringMode: ScoringMode;
   scoreLabel: string;
   targetScore?: number;
+  seedingMode: SeedingMode; // How to assign byes: random or by gamePoints
   isStarted: boolean;
   participants: Participant[];
   matches: Match[];
   currentRound: number;
   totalRounds: number;
+  finalizedRounds?: number[];
   createdAt: number;
   updatedAt: number;
 }
+
+export type SeedingMode = 'random' | 'seeded'; // 'seeded' = highest gamePoints get byes
 
 export interface TournamentState {
   tournaments: Tournament[];
@@ -43,11 +50,12 @@ export type ScoringMode = 'higher_score' | 'best_of' | 'lower_score';
 export type TournamentAction =
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_ERROR'; payload: string | null }
-  | { type: 'CREATE_TOURNAMENT'; payload: { name: string; game: string; scoringMode: ScoringMode; scoreLabel: string; targetScore?: number } }
+  | { type: 'CREATE_TOURNAMENT'; payload: { name: string; game: string; scoringMode: ScoringMode; scoreLabel: string; targetScore?: number; seedingMode?: SeedingMode } }
   | { type: 'DELETE_TOURNAMENT'; payload: string }
   | { type: 'ADD_PARTICIPANT'; payload: { tournamentId: string; name: string } }
   | { type: 'START_TOURNAMENT'; payload: string }
   | { type: 'UPDATE_MATCH'; payload: { tournamentId: string; matchId: string; participant1Score: number; participant2Score: number } }
+  | { type: 'FINALIZE_ROUND'; payload: { tournamentId: string; round: number } }
   | { type: 'SET_ACTIVE_TOURNAMENT'; payload: string | null }
   | { type: 'SET_TOURNAMENTS'; payload: Tournament[] }
   | { type: 'UPDATE_PARTICIPANT'; payload: { tournamentId: string; participantId: string; name: string } }

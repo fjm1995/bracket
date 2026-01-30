@@ -11,6 +11,7 @@ export function ExportImport() {
   const [exportData, setExportData] = useState('');
   const [importError, setImportError] = useState<string | null>(null);
   const [importSuccess, setImportSuccess] = useState(false);
+  const [copySuccess, setCopySuccess] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleExport = useCallback(async () => {
@@ -38,7 +39,8 @@ export function ExportImport() {
   const handleCopyToClipboard = useCallback(async () => {
     try {
       await navigator.clipboard.writeText(exportData);
-      alert('Copied to clipboard!');
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000);
     } catch (error) {
       console.error('Failed to copy:', error);
     }
@@ -66,31 +68,33 @@ export function ExportImport() {
       }
     };
     reader.readAsText(file);
-    
-    // Reset input
     e.target.value = '';
   }, [dispatch]);
 
   return (
     <>
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center gap-2">
         <button
           onClick={handleExport}
-          className="flex items-center space-x-1 px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-lg transition-colors"
+          className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-apple-gray-600 
+                     hover:text-apple-gray-900 hover:bg-apple-gray-100 rounded-apple transition-colors"
           title="Export Tournaments"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" 
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
           </svg>
           <span className="hidden sm:inline">Export</span>
         </button>
         <button
           onClick={() => setIsImportOpen(true)}
-          className="flex items-center space-x-1 px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-lg transition-colors"
+          className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-apple-gray-600 
+                     hover:text-apple-gray-900 hover:bg-apple-gray-100 rounded-apple transition-colors"
           title="Import Tournaments"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" 
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
           </svg>
           <span className="hidden sm:inline">Import</span>
         </button>
@@ -99,25 +103,43 @@ export function ExportImport() {
       {/* Export Modal */}
       <Modal isOpen={isExportOpen} onClose={() => setIsExportOpen(false)} title="Export Tournaments" size="lg">
         <div className="space-y-4">
-          <p className="text-sm text-gray-600">
-            Your tournament data is ready for export. Download or copy to backup your tournaments.
+          <p className="text-sm text-apple-gray-600">
+            Your tournament data is ready. Download or copy to save a backup.
           </p>
-          <div className="bg-gray-50 rounded-lg p-3 max-h-60 overflow-auto">
-            <pre className="text-xs text-gray-700 whitespace-pre-wrap break-all">
+          
+          <div className="bg-apple-gray-50 rounded-apple-lg p-4 max-h-48 overflow-auto scrollbar-apple">
+            <pre className="text-xs text-apple-gray-700 font-mono whitespace-pre-wrap break-all">
               {exportData}
             </pre>
           </div>
-          <div className="flex justify-end space-x-3">
+          
+          <div className="flex justify-end gap-3">
             <button
               onClick={handleCopyToClipboard}
-              className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+              className={`btn-secondary ${copySuccess ? 'bg-apple-green/10 text-apple-green border-apple-green/20' : ''}`}
             >
-              Copy to Clipboard
+              {copySuccess ? (
+                <>
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  Copied!
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" 
+                          d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                  Copy
+                </>
+              )}
             </button>
-            <button
-              onClick={handleDownload}
-              className="px-4 py-2 text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 transition-colors"
-            >
+            <button onClick={handleDownload} className="btn-success">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" 
+                      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
               Download JSON
             </button>
           </div>
@@ -125,21 +147,27 @@ export function ExportImport() {
       </Modal>
 
       {/* Import Modal */}
-      <Modal isOpen={isImportOpen} onClose={() => { setIsImportOpen(false); setImportError(null); }} title="Import Tournaments" size="md">
+      <Modal 
+        isOpen={isImportOpen} 
+        onClose={() => { setIsImportOpen(false); setImportError(null); }} 
+        title="Import Tournaments" 
+        size="md"
+      >
         <div className="space-y-4">
           {importSuccess ? (
             <div className="text-center py-8">
-              <div className="text-green-500 mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-apple-green/10 flex items-center justify-center">
+                <svg className="w-8 h-8 text-apple-green" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <p className="text-lg font-medium text-gray-900">Import Successful!</p>
+              <p className="text-lg font-semibold text-apple-gray-900">Import Successful!</p>
+              <p className="text-sm text-apple-gray-500 mt-1">Your tournaments have been imported.</p>
             </div>
           ) : (
             <>
-              <p className="text-sm text-gray-600">
-                Select a JSON file containing tournament data to import. Existing tournaments with the same ID will be updated.
+              <p className="text-sm text-apple-gray-600">
+                Select a JSON file to import tournaments. Existing tournaments with the same ID will be updated.
               </p>
               
               <input
@@ -152,22 +180,28 @@ export function ExportImport() {
               
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="w-full py-8 border-2 border-dashed border-gray-300 rounded-lg hover:border-emerald-500 hover:bg-emerald-50 transition-colors group"
+                className="w-full py-10 border-2 border-dashed border-apple-gray-300 rounded-apple-lg 
+                         hover:border-apple-blue hover:bg-apple-blue/5 transition-all group"
               >
                 <div className="text-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 mx-auto text-gray-400 group-hover:text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                  </svg>
-                  <p className="mt-2 text-sm text-gray-600 group-hover:text-emerald-600">
-                    Click to select a file or drag and drop
+                  <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-apple-gray-100 
+                               group-hover:bg-apple-blue/10 flex items-center justify-center transition-colors">
+                    <svg className="w-6 h-6 text-apple-gray-400 group-hover:text-apple-blue transition-colors" 
+                         fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" 
+                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                  </div>
+                  <p className="text-apple-gray-600 group-hover:text-apple-blue font-medium transition-colors">
+                    Click to select a file
                   </p>
-                  <p className="mt-1 text-xs text-gray-400">JSON files only</p>
+                  <p className="text-xs text-apple-gray-400 mt-1">JSON files only</p>
                 </div>
               </button>
 
               {importError && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                  <p className="text-sm text-red-600">{importError}</p>
+                <div className="p-3 bg-apple-red/10 border border-apple-red/20 rounded-apple">
+                  <p className="text-sm text-apple-red">{importError}</p>
                 </div>
               )}
             </>
