@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useMemo } from 'react';
+import React, { memo, useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Match } from '../types/bracket';
 import { useTournament } from '../context/TournamentContext';
@@ -21,22 +21,40 @@ export const MatchNode = memo(function MatchNode({
     [state.tournaments, tournamentId]
   );
 
+  // Debounced score update - waits 300ms after user stops typing
+  const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  
   const handleScoreChange = useCallback((
     participant: 'participant1' | 'participant2', 
-    score: string
+    score: number
   ) => {
-    const numScore = Math.max(0, parseInt(score) || 0);
+    // Clear any pending debounce
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
     
-    dispatch({
-      type: 'UPDATE_MATCH',
-      payload: {
-        tournamentId,
-        matchId: match.id,
-        participant1Score: participant === 'participant1' ? numScore : match.participant1Score,
-        participant2Score: participant === 'participant2' ? numScore : match.participant2Score
-      }
-    });
+    // Debounce the dispatch to prevent race conditions
+    debounceRef.current = setTimeout(() => {
+      dispatch({
+        type: 'UPDATE_MATCH',
+        payload: {
+          tournamentId,
+          matchId: match.id,
+          participant1Score: participant === 'participant1' ? score : match.participant1Score,
+          participant2Score: participant === 'participant2' ? score : match.participant2Score
+        }
+      });
+    }, 300);
   }, [dispatch, tournamentId, match.id, match.participant1Score, match.participant2Score]);
+  
+  // Cleanup debounce on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+      }
+    };
+  }, []);
 
   if (!tournament) return null;
 
@@ -203,7 +221,7 @@ interface ParticipantRowProps {
   isWinner: boolean;
   isDisabled: boolean;
   scoreLabel: string;
-  onScoreChange: (score: string) => void;
+  onScoreChange: (score: number) => void;
   isWildCard?: boolean;
 }
 
@@ -216,6 +234,43 @@ const ParticipantRow = memo(function ParticipantRow({
   onScoreChange,
   isWildCard = false
 }: ParticipantRowProps) {
+  // Local state for the input value to prevent "jumping" during typing
+  // Show empty string when score is 0 (use placeholder instead)
+  const [localValue, setLocalValue] = useState<string>(score > 0 ? score.toString() : '');
+  
+  // Sync local value when external score changes (e.g., from another device/reload)
+  useEffect(() => {
+    // Only show actual number if score > 0, otherwise show empty (placeholder will show "0")
+    setLocalValue(score > 0 ? score.toString() : '');
+  }, [score]);
+  
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    
+    // Allow empty string for clearing
+    if (value === '') {
+      setLocalValue('');
+      onScoreChange(0);
+      return;
+    }
+    
+    // Only allow valid numbers
+    const numValue = parseInt(value, 10);
+    if (!isNaN(numValue) && numValue >= 0) {
+      setLocalValue(value);
+      onScoreChange(numValue);
+    }
+  };
+  
+  // On blur, keep empty if 0 (placeholder handles display)
+  const handleBlur = () => {
+    const numValue = parseInt(localValue, 10);
+    if (localValue === '' || isNaN(numValue)) {
+      setLocalValue('');
+      onScoreChange(0);
+    }
+  };
+
   return (
     <div className={`participant-row ${isWinner ? 'participant-row-winner' : participant ? '' : 'opacity-50'}`}>
       <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -271,8 +326,9 @@ const ParticipantRow = memo(function ParticipantRow({
           inputMode="numeric"
           pattern="[0-9]*"
           min="0"
-          value={score || ''}
-          onChange={(e) => onScoreChange(e.target.value)}
+          value={localValue}
+          onChange={handleChange}
+          onBlur={handleBlur}
           className={`score-input ${isWinner ? 'bg-apple-green/10 border-apple-green/30' : ''}`}
           disabled={isDisabled}
           placeholder="0"
