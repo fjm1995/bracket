@@ -230,19 +230,23 @@ describe('Bracket Structure (generateMatchStructure)', () => {
 // ============================================================================
 
 describe('Participant Assignment - Random Mode', () => {
+  // NEW: With distributed bye algorithm, byes are spread evenly across the bracket
+  // This ensures every R2 match gets at least one participant (no empty R2 matches)
+  // Formula: fullMatches = participants - r2MatchCount, byeMatches = r2MatchCount - fullMatches
+  // Where r2MatchCount = bracketSize / 4
   test.each([
     { players: 2, fullMatches: 1, byeMatches: 0, emptyMatches: 0 },
     { players: 3, fullMatches: 1, byeMatches: 1, emptyMatches: 0 },
     { players: 4, fullMatches: 2, byeMatches: 0, emptyMatches: 0 },
-    { players: 5, fullMatches: 2, byeMatches: 1, emptyMatches: 1 },
-    { players: 6, fullMatches: 3, byeMatches: 0, emptyMatches: 1 },
+    { players: 5, fullMatches: 1, byeMatches: 3, emptyMatches: 0 },  // 5 players, 4 R1 matches, 2 R2 matches
+    { players: 6, fullMatches: 2, byeMatches: 2, emptyMatches: 0 },  // 6 players distributed across 4 R1 matches
     { players: 7, fullMatches: 3, byeMatches: 1, emptyMatches: 0 },
     { players: 8, fullMatches: 4, byeMatches: 0, emptyMatches: 0 },
-    { players: 9, fullMatches: 4, byeMatches: 1, emptyMatches: 3 },
+    { players: 9, fullMatches: 1, byeMatches: 7, emptyMatches: 0 },  // 9 players, 8 R1 matches, 4 R2 matches
     { players: 15, fullMatches: 7, byeMatches: 1, emptyMatches: 0 },
     { players: 16, fullMatches: 8, byeMatches: 0, emptyMatches: 0 },
-    { players: 33, fullMatches: 16, byeMatches: 1, emptyMatches: 15 },
-    { players: 100, fullMatches: 50, byeMatches: 0, emptyMatches: 14 },
+    { players: 33, fullMatches: 1, byeMatches: 31, emptyMatches: 0 }, // 33 players distributed across 32 R1 matches
+    { players: 100, fullMatches: 36, byeMatches: 28, emptyMatches: 0 }, // 100 players, 64 R1 matches, 32 R2 matches
   ])('$players players: $fullMatches full, $byeMatches byes, $emptyMatches empty',
     ({ players, fullMatches, byeMatches, emptyMatches }) => {
       const tournament = createTestTournament(players);
@@ -453,8 +457,9 @@ describe('Round Finalization', () => {
 
 describe('Wild Card Logic', () => {
   test('highest-scoring loser fills bye slot after finalization', () => {
-    // 5 players: R1 has 2 full matches + 1 bye
-    const tournament = assignParticipantsToMatches(createTestTournament(5));
+    // With distributed byes, we need more players to have multiple full matches
+    // 6 players: R1 has 2 full matches + 2 bye matches (distributed)
+    const tournament = assignParticipantsToMatches(createTestTournament(6));
     
     const r1Matches = getRoundMatches(tournament, 1);
     const fullMatches = r1Matches.filter(m => m.participant1 && m.participant2);
@@ -470,11 +475,8 @@ describe('Wild Card Logic', () => {
     const loser0 = fullMatches[0].winner?.id === fullMatches[0].participant1?.id
       ? fullMatches[0].participant2
       : fullMatches[0].participant1;
-    const loser1 = fullMatches[1].winner?.id === fullMatches[1].participant1?.id
-      ? fullMatches[1].participant2
-      : fullMatches[1].participant1;
     
-    // Loser from match 0 scored 8, loser from match 1 scored 3
+    // Loser from match 0 scored 8 - should be the wild card candidate
     const higherScoringLoserId = loser0?.id;
     
     // Finalize round 1
@@ -689,13 +691,14 @@ describe('Full Tournament Simulation', () => {
   });
 
   test('tournament with byes completes correctly', () => {
-    const tournament = assignParticipantsToMatches(createTestTournament(5));
+    // With distributed byes, use 7 players for 3 full matches + 1 bye
+    const tournament = assignParticipantsToMatches(createTestTournament(7));
     expect(tournament.totalRounds).toBe(3);
     
-    // Round 1: 2 full + 1 bye
+    // Round 1: 3 full + 1 bye (with distributed byes)
     const r1Full = getRoundMatches(tournament, 1)
       .filter(m => m.participant1 && m.participant2);
-    expect(r1Full.length).toBe(2);
+    expect(r1Full.length).toBe(3);
     
     r1Full.forEach(match => playMatch(match, 10, 5, tournament));
     finalizeRoundIfComplete(tournament, 1);
@@ -1012,11 +1015,42 @@ describe('Edge Cases', () => {
   });
 
   test('one less than power of 2 has exactly 1 bye', () => {
+    // With distributed byes, n-1 players in an n-slot bracket means 1 bye
+    // The bye is distributed to ensure R2 matches are full
     [3, 7, 15, 31, 63].forEach(count => {
       const tournament = assignParticipantsToMatches(createTestTournament(count));
       const r1Matches = getRoundMatches(tournament, 1);
       
       expect(countByeMatches(r1Matches)).toBe(1);
+      expect(countEmptyMatches(r1Matches)).toBe(0); // No empty matches with distributed byes
+    });
+  });
+
+  test('distributed byes ensure no empty R2 matches', () => {
+    // This is the key invariant of the new algorithm
+    [5, 6, 9, 10, 11, 12, 17, 18, 19, 20, 33, 50, 100].forEach(count => {
+      const tournament = assignParticipantsToMatches(createTestTournament(count));
+      const r1Matches = getRoundMatches(tournament, 1);
+      
+      // No empty R1 matches (byes are distributed, not clustered)
+      expect(countEmptyMatches(r1Matches)).toBe(0);
+      
+      // Every R2 match should receive at least one participant
+      // Group R1 matches into pairs and verify each pair has at least one participant
+      const r2MatchCount = r1Matches.length / 2;
+      for (let i = 0; i < r2MatchCount; i++) {
+        const match1 = r1Matches[i * 2];
+        const match2 = r1Matches[i * 2 + 1];
+        const participantsInPair = 
+          (match1.participant1 ? 1 : 0) + 
+          (match1.participant2 ? 1 : 0) + 
+          (match2.participant1 ? 1 : 0) + 
+          (match2.participant2 ? 1 : 0);
+        
+        // Each pair must have at least 2 participants (so R2 match gets 2 winners)
+        // Actually, we need at least 1 participant per pair to avoid empty R2 matches
+        expect(participantsInPair).toBeGreaterThanOrEqual(1);
+      }
     });
   });
 });

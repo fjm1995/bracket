@@ -54,8 +54,11 @@ export function shuffleArray<T>(array: T[]): T[] {
 /**
  * Assigns participants to first-round matches
  * Supports two seeding modes:
- * - 'random': Shuffle participants randomly (default)
+ * - 'random': Shuffle participants randomly, distribute byes evenly (default)
  * - 'seeded': Highest gamePoints get byes (like fantasy football playoffs)
+ * 
+ * Key invariant: Every Round 2 match must receive at least one participant
+ * from Round 1. This is achieved by distributing byes evenly across the bracket.
  */
 export function assignParticipantsToMatches(tournament: Tournament): Tournament {
   const participantCount = tournament.participants.length;
@@ -86,16 +89,9 @@ export function assignParticipantsToMatches(tournament: Tournament): Tournament 
     // Standard bracket seeding: Rank 1 vs Rank 8, Rank 4 vs Rank 5, etc.
     assignSeededParticipants(firstRoundMatches, orderedParticipants, byeCount);
   } else {
-    // RANDOM MODE: Just fill matches sequentially
-    let participantIndex = 0;
-    for (const match of firstRoundMatches) {
-      if (participantIndex < orderedParticipants.length) {
-        match.participant1 = orderedParticipants[participantIndex++];
-      }
-      if (participantIndex < orderedParticipants.length) {
-        match.participant2 = orderedParticipants[participantIndex++];
-      }
-    }
+    // RANDOM MODE: Distribute byes evenly across the bracket
+    // This ensures every R2 match gets at least one participant from R1
+    assignParticipantsWithDistributedByes(firstRoundMatches, orderedParticipants, byeCount);
   }
 
   return {
@@ -104,6 +100,130 @@ export function assignParticipantsToMatches(tournament: Tournament): Tournament 
     totalRounds,
     currentRound: 1
   };
+}
+
+/**
+ * Assigns participants to matches with byes distributed evenly across the bracket.
+ * 
+ * Key insight: We need to ensure that every R2 match receives at least one participant.
+ * This means we need to think in terms of "R2 match feeders" (pairs of R1 matches).
+ * 
+ * Algorithm:
+ * 1. Calculate how many R2 matches we'll have
+ * 2. Ensure each R2 match gets at least one participant from its feeder R1 matches
+ * 3. Distribute remaining participants to create full matches where possible
+ * 
+ * This guarantees no empty R2 matches and minimizes single-participant R2 matches.
+ */
+function assignParticipantsWithDistributedByes(
+  matches: Match[],
+  participants: Participant[],
+  byeCount: number
+): void {
+  const matchCount = matches.length;
+  const participantCount = participants.length;
+  
+  // If no byes needed, just fill sequentially
+  if (byeCount === 0) {
+    let participantIndex = 0;
+    for (const match of matches) {
+      match.participant1 = participants[participantIndex++];
+      match.participant2 = participants[participantIndex++];
+    }
+    return;
+  }
+  
+  // R2 match count (each pair of R1 matches feeds one R2 match)
+  const r2MatchCount = matchCount / 2;
+  
+  // We need to distribute participants across R1 matches such that:
+  // 1. Every R2 match gets at least one participant (no empty R2 matches)
+  // 2. We maximize full R1 matches (both participants present)
+  // 3. Byes are distributed evenly
+  
+  // Each R2 match needs at least 1 participant from its 2 feeder R1 matches
+  // So we need at least r2MatchCount participants to avoid empty R2 matches
+  // If we have fewer participants than r2MatchCount, we'll have empty R2 matches (unavoidable)
+  
+  // Strategy: 
+  // - First, guarantee each R2 match gets at least one participant
+  // - Then, distribute remaining participants to create full matches
+  
+  // Create an array to track how many participants each R2 match will receive
+  // Each R2 match can receive 0-4 participants (from 2 R1 matches, 2 slots each)
+  const r2Allocations: number[] = new Array(r2MatchCount).fill(0);
+  
+  // First pass: Give each R2 match at least 1 participant (if we have enough)
+  let remainingParticipants = participantCount;
+  for (let i = 0; i < r2MatchCount && remainingParticipants > 0; i++) {
+    r2Allocations[i] = 1;
+    remainingParticipants--;
+  }
+  
+  // Second pass: Give each R2 match a second participant (for a full R2 match)
+  for (let i = 0; i < r2MatchCount && remainingParticipants > 0; i++) {
+    r2Allocations[i]++;
+    remainingParticipants--;
+  }
+  
+  // Third pass: Give each R2 match a third participant (one full R1 match + one bye)
+  for (let i = 0; i < r2MatchCount && remainingParticipants > 0; i++) {
+    r2Allocations[i]++;
+    remainingParticipants--;
+  }
+  
+  // Fourth pass: Give each R2 match a fourth participant (two full R1 matches)
+  for (let i = 0; i < r2MatchCount && remainingParticipants > 0; i++) {
+    r2Allocations[i]++;
+    remainingParticipants--;
+  }
+  
+  // Now assign participants to R1 matches based on allocations
+  let participantIndex = 0;
+  
+  for (let r2Idx = 0; r2Idx < r2MatchCount; r2Idx++) {
+    const allocation = r2Allocations[r2Idx];
+    const match1Idx = r2Idx * 2;     // First R1 match in pair
+    const match2Idx = r2Idx * 2 + 1; // Second R1 match in pair
+    
+    const match1 = matches[match1Idx];
+    const match2 = matches[match2Idx];
+    
+    // Distribute participants based on allocation
+    // Allocation 0: Both R1 matches empty (R2 match will be empty)
+    // Allocation 1: One participant in first R1 match (R2 match gets 1 participant)
+    // Allocation 2: One participant in each R1 match (R2 match gets 2 participants)
+    // Allocation 3: First R1 match full, second has 1 (R2 match gets 2 participants)
+    // Allocation 4: Both R1 matches full (R2 match gets 2 participants)
+    
+    switch (allocation) {
+      case 0:
+        // Empty - nothing to assign
+        break;
+      case 1:
+        // One participant in first match
+        match1.participant1 = participants[participantIndex++];
+        break;
+      case 2:
+        // One participant in each match (distributed byes)
+        match1.participant1 = participants[participantIndex++];
+        match2.participant1 = participants[participantIndex++];
+        break;
+      case 3:
+        // First match full, second has one
+        match1.participant1 = participants[participantIndex++];
+        match1.participant2 = participants[participantIndex++];
+        match2.participant1 = participants[participantIndex++];
+        break;
+      case 4:
+        // Both matches full
+        match1.participant1 = participants[participantIndex++];
+        match1.participant2 = participants[participantIndex++];
+        match2.participant1 = participants[participantIndex++];
+        match2.participant2 = participants[participantIndex++];
+        break;
+    }
+  }
 }
 
 /**
